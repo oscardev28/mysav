@@ -6,8 +6,15 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body>
-  <app-root></app-root>
+<body class="relative">
+  <!-- Fondo -->
+  <div class="fixed h-full w-full bg-slate-950 z-0">
+    <div class="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]"></div>
+  </div>
+
+  <!-- El contenido principal, asegurándote que esté por encima del fondo -->
+  <app-root class="relative z-10"></app-root>
 </body>
 </html>

@@ -1,0 +1,9 @@
+<a *ngIf="href != ''" class="btn_small flex items-center justify-center" href="{{ href }}">
+  <i class="ri-arrow-left-fill mr-2"></i>
+  {{ texto }}
+</a>
+
+<button *ngIf="href == ''" class="btn_small flex items-center justify-center">
+  <i class="ri-arrow-left-fill mr-2"></i>
+  {{ texto }}
+</button>

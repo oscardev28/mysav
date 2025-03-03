@@ -1,0 +1,31 @@
+<div class="flex flex-col items-center justify-center h-screen">
+  <h2 class="text-2xl font-bold mb-4 text-white">Iniciar sesión</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col justify-center items-center">
+    <input formControlName="email" type="email" placeholder="Correo" class="border p-2 mb-2 w-64 outline-none">
+    <span *ngIf="loginForm.controls['email'].invalid && loginForm.controls['email'].touched" class="text-red-500">
+      Correo inválido
+    </span>
+
+    <div class="relative w-64">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        formControlName="password"
+        placeholder="Contraseña"
+        class="border p-2 pr-10 w-full outline-none"
+      >
+      <i
+        [ngClass]="showPassword ? 'ri-eye-fill' : 'ri-eye-close-fill'"
+        (click)="togglePassword()"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
+      </i>
+    </div>
+    <span *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched" class="text-red-500 mt-3">
+      La contraseña debe tener al menos 6 caracteres
+    </span>
+
+    <span *ngIf="error.state" class="bg-red-500 p-3 mt-5 text-white">{{ error.text }}</span>
+
+    <input [disabled]="loginForm.invalid" type="submit" class="btn mt-4" value="Iniciar sesión">
+  </form>
+</div>

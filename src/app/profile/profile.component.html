@@ -1,0 +1,53 @@
+
+<div class="flex flex-col items-center justify-center min-h-screen h-100 pt-20 mb-10">
+  <h2 class="text-2xl font-bold mb-4 text-white">Mi perfil</h2>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="[&>div>label]:text-white my-4 flex flex-col items-center">
+    <div class="relative mb-4">
+      <img [src]="previewUrl || profileForm.value.photoURL || 'assets/img/usuario.webp'"
+        alt="Foto de perfil"
+        class="w-36 h-36 rounded-full border-2 border-gray-300 object-cover">
+    </div>
+
+    <!-- Botón para subir foto -->
+    <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
+    <button type="button" class="btn text-sm mb-6" (click)="openFileInput()">Subir Foto</button>
+
+    <div class="flex flex-col mb-3">
+      <label for="name">Nombre:</label>
+      <input id="name" formControlName="name" type="text" placeholder="Nombre..." class="border p-2 mb-2 w-64 outline-none">
+    </div>
+    <div class="flex flex-col mb-3">
+      <label for="lastname">Apellidos</label>
+      <input id="lastname" formControlName="lastname" type="text" placeholder="Apellidos..." class="border p-2 mb-2 w-64 outline-none">
+    </div>
+    <div class="flex flex-col mb-3">
+      <label for="nick">Nombre de usuario</label>
+      <input id="nick" formControlName="nick" type="text" placeholder="Nombre de usuario..." class="border p-2 mb-2 w-64 outline-none">
+    </div>
+    <div class="flex flex-col mb-3">
+      <label for="age">Edad</label>
+      <input id="age" formControlName="age" type="number" placeholder="Edad..." class="border p-2 mb-2 w-64 outline-none">
+    </div>
+    <div class="flex flex-col mb-3">
+      <label for="newPassword">Nueva contraseña</label>
+      <div class="relative w-64">
+        <input id="newPassword"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="newPassword"
+          placeholder="Nueva contraseña"
+          class="border p-2 pr-10 w-full outline-none"
+        >
+        <i
+          [ngClass]="showPassword ? 'ri-eye-fill' : 'ri-eye-close-fill'"
+          (click)="togglePassword()"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
+        </i>
+      </div>
+    </div>
+
+    <span *ngIf="error.state" class="bg-red-500 p-3 mt-5 text-white">{{ error.text }}</span>
+    <button type="submit" [disabled]="!profileForm.valid" class="text-center btn mt-4">Guardar</button>
+  </form>
+
+</div>

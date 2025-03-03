@@ -1,0 +1,19 @@
+.fade-in {
+  opacity: 0;
+  animation: fadeIn ease-in 1s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.typed-cursor, .typed-cursor * {
+  color: initial !important; /* Restaura el color original del emoji */
+}
+
+

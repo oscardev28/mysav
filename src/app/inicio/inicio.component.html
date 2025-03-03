@@ -1,0 +1,96 @@
+<section [@slideAnimation]="animationDirection" *ngIf="!animating" class="px-5 m-auto lg:w-4/5 w-full overflow-hidden h-screen max-w-screen flex flex-col justify-center items-center">
+  <a href="/plan" class="btn font-bold text-xs mt-8 mb-10">Mi plan</a>
+  <!--<button (click)="generarDatos()" class="btn font-bold text-xs absolute top-20 left-2">
+    Generar Gastos Aleatorios
+  </button>-->
+
+  <div class="flex justify-between items-center w-full mb-5">
+    <i (click)="changeMonth(false)" class="text-xl bg-gradient flex justify-center items-center h-10 w-10 rounded-full ri-arrow-left-fill text-white hover:scale-105 transition-all ease-in-out"></i>
+    <h1 class="text-white text-xl bg-gradient px-3 py-2 rounded-md font-bold">{{ title }}</h1>
+    <i (click)="changeMonth(true)" class="text-xl bg-gradient flex justify-center items-center h-10 w-10 rounded-full ri-arrow-right-fill text-white hover:scale-105 transition-all ease-in-out"></i>
+  </div>
+
+  <div *ngIf="remainingMoney < 100 && remainingMoney > 0" class="flex items-center bg-orange-400 opacity-80 my-5 rounded-xl text-white p-2 text-sm"><i class="text-2xl mr-3 ri-alert-fill"></i>¡Cuidado! Te quedan menos de 100€ para llegar a tu límite mensual</div>
+  <div *ngIf="remainingMoney <= 0" class="flex items-center bg-red-400 opacity-80 my-5 rounded-xl text-white p-2 text-sm"><i class="text-2xl mr-3 ri-error-warning-fill"></i>¡Has superado tu límite mensual!</div>
+
+  <article id="progress" class="my-5 w-full">
+    <!-- Barra de progreso -->
+    <div class="relative w-full">
+      <div [style.left.%]="50"
+        class="absolute bottom-full mb-1 transform -translate-x-1/2 text-white font-bold text-sm px-2">
+        {{ porcentajeTotalGasto | number:'1.0-0' }}%
+      </div>
+
+      <!-- Barra de progreso -->
+      <div class="progress-bar rounded-lg border-2 h-6 w-full flex relative overflow-hidden">
+        <div class="h-full bg-blue-500" [style.width.%]="porcentajeFijos"></div>
+        <div class="h-full bg-green-500" [style.width.%]="porcentajeVariables"></div>
+        <div class="h-full ml-auto bg-red-500" [style.width.%]="porcentajeAhorro"></div>
+      </div>
+    </div>
+
+    <!-- Porcentajes debajo -->
+    <div class="w-full flex justify-between mt-3">
+      <div class="w-full ml-auto flex flex-col text-sm font-bold text-white">
+        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-blue-500 mr-2"></div>{{ porcentajeFijos | number:'1.0-0' }}% Fijos</span>
+        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-green-500 mr-2"></div>{{ porcentajeVariables | number:'1.0-0' }}% Variables</span>
+        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-red-500 mr-2"></div>{{ porcentajeAhorro | number:'1.0-0' }}% Ahorro</span>
+      </div>
+      <div class="w-full flex flex-col text-sm font-bold text-white">
+        <span>Dinero gastado: {{ totalGasto }} €</span>
+        <span>Dinero restante: {{ remainingMoney }} €</span>
+        <span>Ahorro: {{ ahorro }} €</span>
+        <span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="flex w-full my-4 gap-x-2">
+    <button (click)="changeView('table')" class="btn font-bold text-xs">Tabla</button>
+    <button (click)="changeView('grafico')" class="btn font-bold text-xs">Gráfico</button>
+    <button (click)="changeView('estadisticas')" class="btn font-bold text-xs">Estadísticas</button>
+  </article>
+
+  <article *ngIf="plan && view == 'table'" id="records" class="my-5 w-full">
+    <div class="rounded-lg bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 overflow-auto max-h-96">
+      <table class="text-sm w-full border border-gray-300 border-separate border-spacing-0 bg-white text-black rounded-lg overflow-hidden">
+        <thead>
+          <tr class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-white">
+            <th class="border border-gray-300 px-1 py-2">Fecha</th>
+            <th class="border border-gray-300 px-1 py-2">Nombre</th>
+            <th class="border border-gray-300 px-1 py-2">€</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bg-blue-500">
+            <td class="border border-gray-300 px-1 py-2 font-bold text-white text-center" colspan="3">FIJOS</td>
+          </tr>
+          <tr *ngFor="let gasto of plan.gastos" class="border border-gray-300">
+            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.fecha) }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.nombre }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.valor }}€</td>
+          </tr>
+
+          <tr class="bg-green-500">
+            <td class="border border-gray-300 px-1 py-2 font-bold text-white text-center" colspan="3">VARIABLES</td>
+          </tr>
+
+          <tr *ngFor="let gasto of plan.gastosVariables" class="border border-gray-300">
+            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.fecha) }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.nombre }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.valor }}€</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article *ngIf="plan && view == 'grafico'" class="my-5 w-full">
+    <app-grafico-gastos [plan]="plan"></app-grafico-gastos>
+  </article>
+
+  <article *ngIf="plan && view == 'estadisticas'" class="my-5 w-full">
+    <app-estadisticas [plan]="plan"></app-estadisticas>
+  </article>
+</section>
+

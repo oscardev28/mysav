@@ -1,0 +1,131 @@
+<div class="plan min-h-screen py-20 flex flex-col justify-center text-white items-center px-8">
+  <div class="w-full flex {{ step === 1 ? 'justify-end' : ( step == 2 ? 'justify-between' : 'justify-start' ) }} items-center">
+    <BackBtn *ngIf="step > 1" (click)="changeStep(step - 1)" class="text-white mb-5" [texto]="'Paso ' + (step - 1)"></BackBtn>
+    <NextBtn *ngIf="step < 3" (click)="changeStep(step + 1)" class="text-white mb-5" [texto]="'Paso ' + (step + 1)"></NextBtn>
+  </div>
+  <h2 class="text-2xl font-bold mb-4 text-white">{{ title }}</h2>
+
+  <!-- Paso 1: Ingresos y Ahorro -->
+  <form *ngIf="step == 1" [formGroup]="planForm" class="[&>input]:w-full [&>div]:w-full w-full flex flex-col items-center">
+    <div class="my-2 flex flex-col gap-y-2">
+      <label for="ingresos">Ingresos</label>
+      <input formControlName="ingresos" id="ingresos" type="number" placeholder="Ingresos"
+        class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['ingresos'].invalid && planForm.controls['ingresos'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-2 flex flex-col gap-y-2">
+      <label for="ahorro">Objetivo de ahorro</label>
+      <input formControlName="ahorro" id="ahorro" type="number" placeholder="Ahorro" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['ahorro'].invalid && planForm.controls['ahorro'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <button type="button" (click)="continuar()" [disabled]="planForm.controls['ingresos'].invalid || planForm.controls['ahorro'].invalid"
+      class="btn mt-4">Continuar</button>
+  </form>
+
+  <!-- Paso 2: Añadir Gastos fijos -->
+  <form *ngIf="step == 2" [formGroup]="planForm" class="[&>input]:w-full [&>div]:w-full w-full flex flex-col items-center">
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="nombre">Nombre del Gasto</label>
+      <input formControlName="nombre" id="nombre" type="text" placeholder="Nombre" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['nombre'].invalid && planForm.controls['nombre'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="tipo">Tipo</label>
+      <select formControlName="tipo" id="tipo" class="border text-black p-2 mb-2 w-full outline-none">
+        <option *ngFor="let item of tiposDeGasto; let i = index" [selected]="i === 0" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+      <span *ngIf="planForm.controls['tipo'].invalid && planForm.controls['tipo'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="valor">Valor</label>
+      <input formControlName="valor" id="valor" type="text" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['valor'].invalid && planForm.controls['valor'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <button type="button" (click)="agregarGasto()" class="btn mt-3 text-xs">Añadir</button>
+
+    <div class="w-full overflow-x-scroll">
+      <table class="my-8 border-collapse border w-full border-gray-500">
+        <tr class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+          <th class="border border-gray-500 px-4 py-2">Nombre</th>
+          <th class="border border-gray-500 px-4 py-2">Tipo</th>
+          <th class="border border-gray-500 px-4 py-2">Valor</th>
+          <th class="border border-gray-500 px-4 py-2">Eliminar</th>
+        </tr>
+        <tr *ngFor="let gasto of gastos">
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.nombre }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">
+            <i class="text-red-500 ri-delete-bin-fill"></i>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <button type="button" (click)="guardarPlan()" [disabled]="gastos.length === 0" class="btn mt-4">Guardar y continuar</button>
+  </form>
+
+  <!-- Paso 3: Añadir Gastos -->
+  <form *ngIf="step == 3" [formGroup]="planForm" class="[&>input]:w-full [&>div]:w-full w-full flex flex-col items-center">
+    <span class="my-3">¡Enhorabuena! Ya has completado tus gastos fijos, ahora deberás ir añadiendo tus gastos variables</span>
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="nombre">Nombre del Gasto</label>
+      <input formControlName="nombre" id="nombre" type="text" placeholder="Nombre" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['nombre'].invalid && planForm.controls['nombre'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="tipo">Tipo</label>
+      <select formControlName="tipo" id="tipo" class="border text-black p-2 mb-2 w-full outline-none">
+        <option *ngFor="let item of tiposDeGastoVariable; let i = index" [selected]="i === 0" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+      <span *ngIf="planForm.controls['tipo'].invalid && planForm.controls['tipo'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-1 flex flex-col gap-y-1">
+      <label for="valor">Valor</label>
+      <input formControlName="valor" id="valor" type="text" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['valor'].invalid && planForm.controls['valor'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <button type="button" (click)="agregarGastoVariable()" class="btn mt-3 text-xs">Añadir</button>
+
+    <div class="w-full overflow-x-scroll">
+      <table class="my-8 border-collapse border w-full border-gray-500">
+        <tr class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+          <th class="border border-gray-500 px-4 py-2">Nombre</th>
+          <th class="border border-gray-500 px-4 py-2">Tipo</th>
+          <th class="border border-gray-500 px-4 py-2">Valor</th>
+          <th class="border border-gray-500 px-4 py-2">Eliminar</th>
+        </tr>
+        <tr *ngFor="let gasto of gastosVariables">
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.nombre }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">
+            <i class="text-red-500 ri-delete-bin-fill"></i>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <button type="button" (click)="guardarGastos()" [disabled]="gastosVariables.length === 0" class="btn mt-4">Guardar Plan</button>
+  </form>
+</div>

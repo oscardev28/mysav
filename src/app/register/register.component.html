@@ -1,0 +1,31 @@
+<div class="flex flex-col items-center justify-center h-screen">
+  <h2 class="text-2xl font-bold mb-4 text-white">Registrarse</h2>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">
+    {{ errorMessage }}
+  </div>
+
+  <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="flex flex-col justify-center items-center">
+    <input required name="name" #name="ngModel" [(ngModel)]="user.name" placeholder="Nombre" class="border p-2 mb-2 w-64 outline-none {{ (!name.valid && name.touched) ? 'border-2 border-red-500' : '' }}">
+    <input required name="lastname" #lastname="ngModel" [(ngModel)]="user.lastname" placeholder="Apellidos" class="border p-2 mb-2 w-64 outline-none {{ (!lastname.valid && lastname.touched) ? 'border-2 border-red-500' : '' }}">
+    <input required name="nick" #nick="ngModel" [(ngModel)]="user.nick" placeholder="Nombre de usuario" class="border p-2 mb-2 w-64 outline-none {{ (!nick.valid && nick.touched) ? 'border-2 border-red-500' : '' }}">
+    <input required name="email" #email="ngModel" [(ngModel)]="user.email" placeholder="Correo" class="border p-2 mb-2 w-64 outline-none {{ (!email.valid && email.touched) ? 'border-2 border-red-500' : '' }}">
+    <div class="relative w-64">
+      <input
+        required
+        #password="ngModel" [(ngModel)]="user.password"
+        [type]="showPassword ? 'text' : 'password'"
+        name="password"
+        placeholder="Contraseña"
+        class="border p-2 mb-2 w-64 outline-none {{ (!password.valid && password.touched) ? 'border-2 border-red-500' : '' }}"
+      >
+      <i
+        [ngClass]="showPassword ? 'ri-eye-fill' : 'ri-eye-close-fill'"
+        (click)="togglePassword()"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
+      </i>
+    </div>
+    <input required name="" [disabled]="!registerForm.form.valid" type="submit" class="btn mt-4" value="Registrarse">
+  </form>
+</div>

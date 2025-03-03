@@ -1,0 +1,7 @@
+.navbar_item {
+  border-bottom: 1px solid #9b9797;
+}
+
+.navbar_item:first-child {
+  border-top: 1px solid #9b9797;
+}
