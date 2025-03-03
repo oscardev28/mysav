@@ -29,13 +29,21 @@
       <label for="age">Edad</label>
       <input id="age" formControlName="age" type="number" placeholder="Edad..." class="border p-2 mb-2 w-64 outline-none">
     </div>
+
+    <span *ngIf="error.state" class="bg-red-500 p-3 mt-5 text-white">{{ error.text }}</span>
+    <button type="submit" [disabled]="!profileForm.valid" class="text-center btn mt-4">Guardar</button>
+  </form>
+
+  <button type="button" #btn (click)="showChangePassword(btn)" class="text-center flex items-center btn mt-4">Cambiar contraseña <i class="ml-3 ri-arrow-down-fill"></i></button>
+
+  <form [formGroup]="passForm" (ngSubmit)="changePassword()" class="[&>div>label]:text-white my-4 flex flex-col items-center" *ngIf="changePass">
     <div class="flex flex-col mb-3">
-      <label for="newPassword">Nueva contraseña</label>
+      <label for="lastPassword">Anterior contraseña</label>
       <div class="relative w-64">
-        <input id="newPassword"
+        <input id="lastPassword"
           [type]="showPassword ? 'text' : 'password'"
-          formControlName="newPassword"
-          placeholder="Nueva contraseña"
+          formControlName="lastPassword"
+          placeholder="Anterior contraseña"
           class="border p-2 pr-10 w-full outline-none"
         >
         <i
@@ -45,9 +53,40 @@
         </i>
       </div>
     </div>
+    <div class="flex flex-col mb-3">
+      <label for="newPassword">Nueva contraseña</label>
+      <div class="relative w-64">
+        <input id="newPassword"
+          [type]="showPassword2 ? 'text' : 'password'"
+          formControlName="newPassword"
+          placeholder="Nueva contraseña"
+          class="border p-2 pr-10 w-full outline-none"
+        >
+        <i
+          [ngClass]="showPassword2 ? 'ri-eye-fill' : 'ri-eye-close-fill'"
+          (click)="togglePassword(2)"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
+        </i>
+      </div>
+    </div>
+    <div class="flex flex-col mb-3">
+      <label for="newPasswordRep">Repite la nueva contraseña</label>
+      <div class="relative w-64">
+        <input id="newPasswordRep"
+          [type]="showPassword3 ? 'text' : 'password'"
+          formControlName="newPasswordRep"
+          placeholder="Nueva contraseña"
+          class="border p-2 pr-10 w-full outline-none"
+        >
+        <i
+          [ngClass]="showPassword3 ? 'ri-eye-fill' : 'ri-eye-close-fill'"
+          (click)="togglePassword(3)"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl">
+        </i>
+      </div>
+    </div>
+    <button type="submit" class="text-center btn mt-4">Guardar</button>
 
-    <span *ngIf="error.state" class="bg-red-500 p-3 mt-5 text-white">{{ error.text }}</span>
-    <button type="submit" [disabled]="!profileForm.valid" class="text-center btn mt-4">Guardar</button>
   </form>
 
 </div>
