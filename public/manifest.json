@@ -1,0 +1,20 @@
+{
+  "name": "My Sav",
+  "short_name": "MySav",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#60a5fa",
+  "icons": [
+    {
+      "src": "/appIcon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "/appIcon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}
