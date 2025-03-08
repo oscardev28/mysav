@@ -21,20 +21,10 @@
 </html>
 
 <script>
-  window.onerror = function(message, source, lineno, colno, error) {
-    document.body.innerHTML += `<div style="background: red; color: white; padding: 10px;">
-      <strong>Error:</strong> ${message}<br>
-      <strong>Archivo:</strong> ${source}<br>
-      <strong>Línea:</strong> ${lineno}, Columna: ${colno}<br>
-    </div>`;
-  };
-</script>
-
-<script>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js").then(() => {
-      console.log("Service Worker registrado!");
-    });
+    navigator.serviceWorker.register("/sw.js", { type: "module" })
+      .then(() => console.log("✅ Service Worker registrado"))
+      .catch(err => console.error("❌ Error registrando Service Worker:", err));
   }
 </script>
 
