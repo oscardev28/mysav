@@ -10,4 +10,9 @@ import { HeaderComponent } from './header/header.component';
 })
 export class AppComponent {
   title = 'mysav';
+
+  constructor() {
+    console.log("✅ Angular cargado correctamente");
+    alert("✅ Angular cargado correctamente");
+  }
 }
