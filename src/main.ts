@@ -6,5 +6,18 @@ bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
 
   console.log("Intentando bootstrap de Angular...");
-  alert("Intentando bootstrap de Angular...");
+alert("Intentando bootstrap de Angular...");
+
+
+
+bootstrapApplication(AppComponent, appConfig)
+  .then(() => {
+    console.log("✅ Bootstrap de Angular completado");
+    alert("✅ Bootstrap de Angular completado");
+  })
+  .catch(err => {
+    console.error("❌ Error en Bootstrap:", err);
+    alert("❌ Error en Bootstrap: " + err.message);
+  });
+
 
