@@ -23,6 +23,7 @@ interface Gasto {
 })
 
 export class PlanComponent implements OnInit {
+  existingPlan: boolean = false;
   planForm: FormGroup;
   step: number = 1;
   title: string = 'Mi plan de gasto mensual';
@@ -58,8 +59,11 @@ export class PlanComponent implements OnInit {
     try {
       const plan = await this.planService.obtenerPlanActual();
       if (plan) {
+        this.existingPlan = true;
         this.ingresos = plan.ingresos;
         this.ahorro = plan.ahorro;
+        this.planForm.controls['ingresos'].setValue(this.ingresos);
+        this.planForm.controls['ahorro'].setValue(this.ahorro);
         this.gastos = plan.gastos;
         this.gastosVariables = plan.gastosVariables;
         this.step = 3; // Ir directo a edición si ya existe un plan

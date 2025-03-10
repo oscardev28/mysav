@@ -98,9 +98,8 @@ export class InicioComponent implements OnInit {
       this.router.navigate(['/plan']);
     } else {
       console.log(`Plan actualizado para ${this.currentMonth + 1}/${this.currentYear}`, this.plan);
+      this.getGastos()
     }
-
-    this.getGastos()
   }
 
   getRemainingMoney() {

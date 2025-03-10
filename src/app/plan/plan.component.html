@@ -1,7 +1,7 @@
 <div class="plan min-h-screen py-20 flex flex-col justify-center text-white items-center px-8">
   <div class="w-full flex {{ step === 1 ? 'justify-end' : ( step == 2 ? 'justify-between' : 'justify-start' ) }} items-center">
     <BackBtn *ngIf="step > 1" (click)="changeStep(step - 1)" class="text-white mb-5" [texto]="'Paso ' + (step - 1)"></BackBtn>
-    <NextBtn *ngIf="step < 3" (click)="changeStep(step + 1)" class="text-white mb-5" [texto]="'Paso ' + (step + 1)"></NextBtn>
+    <NextBtn *ngIf="step < 3 && existingPlan" (click)="changeStep(step + 1)" class="text-white mb-5" [texto]="'Paso ' + (step + 1)"></NextBtn>
   </div>
   <h2 class="text-2xl font-bold mb-4 text-white">{{ title }}</h2>
 
