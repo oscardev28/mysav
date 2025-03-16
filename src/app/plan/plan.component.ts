@@ -8,6 +8,7 @@ import { BackBtnComponent } from '../buttons/back-btn/back-btn.component';
 import { NextBtnComponent } from '../buttons/next-btn/next-btn.component';
 
 interface Gasto {
+  id?: string;
   nombre: string;
   tipo: string;
   valor: number;
@@ -31,6 +32,8 @@ export class PlanComponent implements OnInit {
   ahorro: number = 0;
   gastos: Gasto[] = [];
   gastosVariables: Gasto[] = [];
+  newGastos: Gasto[] = [];
+  newGastosVariables: Gasto[] = [];
 
   tiposDeGasto: string[] = [
     "Alquiler/Hipoteca", "Supermercado", "Internet", "Teléfono", "Gasolina", "Coche", "Suscripciones", "Seguro", "Luz", "Agua", "Gimnasio",
@@ -55,7 +58,11 @@ export class PlanComponent implements OnInit {
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.obtenerPlan();
+  }
+
+  async obtenerPlan() {
     try {
       const plan = await this.planService.obtenerPlanActual();
       if (plan) {
@@ -106,6 +113,12 @@ export class PlanComponent implements OnInit {
         valor: this.planForm.value.valor,
         fecha: ''
       });
+      this.newGastos.push({
+        nombre: this.planForm.value.nombre,
+        tipo: this.planForm.value.tipo,
+        valor: this.planForm.value.valor,
+        fecha: ''
+      });
       this.planForm.reset();
     }
   }
@@ -118,26 +131,59 @@ export class PlanComponent implements OnInit {
         valor: this.planForm.value.valor,
         fecha: ''
       });
+      this.newGastosVariables.push({
+        nombre: this.planForm.value.nombre,
+        tipo: this.planForm.value.tipo,
+        valor: this.planForm.value.valor,
+        fecha: ''
+      });
       this.planForm.reset();
     }
   }
 
-  async guardarPlan() {
+  deleteGasto(gasto: Gasto, tipo: 'fijo' | 'variable') {
+    if (confirm('¿Seguro que quieres eliminar este gasto?')) {
+      if(tipo === 'fijo' && this.newGastos.includes(gasto)) {
+        this.gastos = this.newGastos.filter(g => g !== gasto);
+      } else if(tipo === 'variable' && this.newGastosVariables.includes(gasto)) {
+        this.gastosVariables = this.newGastosVariables.filter(g => g !== gasto);
+      }else {
+        this.planService.eliminarGasto(gasto, tipo)
+          .then(() => {
+            console.log('Gasto eliminado en la UI');
+            this.obtenerPlan();
+            // 🔹 Aquí puedes actualizar la lista de gastos en la UI si es necesario
+          })
+          .catch(error => console.error('Error al eliminar el gasto:', error));
+      }
+    }
+  }
+
+  async guardarPlan(btn: HTMLButtonElement) {
+    btn.disabled = true;
     try {
-      const planId = await this.planService.guardarPlan(this.ingresos, this.ahorro, this.gastos, this.gastosVariables);
+      const planId = await this.planService.guardarPlan(this.ingresos, this.ahorro, this.newGastos, this.newGastosVariables);
+      this.newGastos = [];
+      this.newGastosVariables = [];
       alert('Plan de gastos guardado con éxito');
       this.step = 3;
       this.title = 'Añade tus gastos adicionales';
+      btn.disabled = false;
     } catch (error) {
+      btn.disabled = false;
       console.error("Error al guardar el plan:", error);
     }
   }
 
-  async guardarGastos() {
+  async guardarGastos(btn: HTMLButtonElement) {
+    btn.disabled = true;
     try {
-      const planId = await this.planService.añadirGastos(this.gastosVariables);
+      const planId = await this.planService.añadirGastos(this.newGastosVariables);
+      this.newGastosVariables = [];
       alert('Guardado correctamente');
+      btn.disabled = false;
     } catch (error) {
+      btn.disabled = false;
       console.error("Error al guardar el plan:", error);
     }
   }

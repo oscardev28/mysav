@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, doc, setDoc, getDoc, addDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, setDoc, arrayRemove, getDoc, deleteDoc, addDoc, updateDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
 interface Gasto {
+  id?: string;
   nombre: string;
   tipo: string;
   valor: number;
@@ -40,10 +41,22 @@ export class PlanService {
     const user = this.auth.currentUser;
     if (!user) throw new Error("Usuario no autenticado");
 
-    // Agregar fecha a cada gasto
+    console.log('Gastos:', gastos);
+    console.log('Gastos variables:', gastosVariables);
+
+    // Agregar ID y fecha a cada gasto
     const fechaActual = this.obtenerFechaActual();
-    const gastosConFecha = gastos.map(gasto => ({ ...gasto, fecha: fechaActual }));
-    const gastosVariablesConFecha = gastosVariables.map(gasto => ({ ...gasto, fecha: fechaActual }));
+    const gastosConDatos = gastos.map(gasto => ({
+      ...gasto,
+      id: doc(collection(this.firestore, 'plans')).id, // 🔹 Generar ID único para cada gasto
+      fecha: fechaActual
+    }));
+
+    const gastosVariablesConDatos = gastosVariables.map(gasto => ({
+      ...gasto,
+      id: doc(collection(this.firestore, 'plans')).id, // 🔹 Generar ID único para cada gasto variable
+      fecha: fechaActual
+    }));
 
     const userDocRef = doc(this.firestore, 'users', user.uid);
     const userSnap = await getDoc(userDocRef);
@@ -61,8 +74,8 @@ export class PlanService {
         await updateDoc(planDocRef, {
           ingresos,
           ahorro,
-          gastos: [...planData.gastos, ...gastosConFecha], // Agrega los nuevos gastos
-          gastosVariables: [...planData.gastosVariables, ...gastosVariablesConFecha]
+          gastos: [...planData.gastos, ...gastosConDatos], // 🔹 Mantener los gastos previos y agregar los nuevos
+          gastosVariables: [...planData.gastosVariables, ...gastosVariablesConDatos]
         });
 
         return planId;
@@ -75,8 +88,8 @@ export class PlanService {
       userId: user.uid,
       ingresos,
       ahorro,
-      gastos: gastosConFecha,
-      gastosVariables: gastosVariablesConFecha
+      gastos: gastosConDatos,
+      gastosVariables: gastosVariablesConDatos
     });
 
     await setDoc(userDocRef, { planId: newPlanRef.id }, { merge: true });
@@ -88,25 +101,27 @@ export class PlanService {
     const user = this.auth.currentUser;
     if (!user) throw new Error("Usuario no autenticado");
 
-    // Agregar fecha a cada gasto
     const fechaActual = this.obtenerFechaActual();
-    const gastosVariablesConFecha = gastosVariables.map(gasto => ({ ...gasto, fecha: fechaActual }));
-
     const userDocRef = doc(this.firestore, 'users', user.uid);
     const userSnap = await getDoc(userDocRef);
     const userData = userSnap.data() as { planId?: string };
     const planId = userData?.planId;
 
+    const gastosVariablesConID = gastosVariables.map(gasto => ({
+      ...gasto,
+      id: doc(collection(this.firestore, 'plans')).id, // 🔹 Generar ID único para cada gasto
+      fecha: fechaActual
+    }));
+
     if (planId) {
-      // Si el plan ya existe, actualizarlo
       const planDocRef = doc(this.firestore, 'plans', planId);
       const planSnap = await getDoc(planDocRef);
 
       if (planSnap.exists()) {
-        const planData = planSnap.data() as Plan;
+        const planData = planSnap.data() as { gastosVariables: Gasto[] };
 
         await updateDoc(planDocRef, {
-          gastosVariables: [...planData.gastosVariables, ...gastosVariablesConFecha]
+          gastosVariables: [...planData.gastosVariables, ...gastosVariablesConID]
         });
 
         return planId;
@@ -117,12 +132,42 @@ export class PlanService {
     const plansCollection = collection(this.firestore, 'plans');
     const newPlanRef = await addDoc(plansCollection, {
       userId: user.uid,
-      gastosVariables: gastosVariablesConFecha
+      gastosVariables: gastosVariablesConID
     });
 
     await setDoc(userDocRef, { planId: newPlanRef.id }, { merge: true });
 
     return newPlanRef.id;
+  }
+
+  async eliminarGasto(gasto: Gasto, tipo: 'fijo' | 'variable'): Promise<void> {
+    try {
+      const user = this.auth.currentUser;
+      if (!user) throw new Error("Usuario no autenticado");
+
+      const userDocRef = doc(this.firestore, 'users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+      const userData = userSnap.data() as { planId?: string };
+      const planId = userData?.planId;
+
+      if (!planId) throw new Error("No se encontró el plan del usuario");
+
+      const planDocRef = doc(this.firestore, 'plans', planId);
+
+      // 🔹 Determinar si es un gasto fijo o variable
+      const fieldToUpdate = tipo === 'fijo' ? 'gastos' : 'gastosVariables';
+
+      // 🔥 Eliminar el gasto del array en Firestore
+      await updateDoc(planDocRef, {
+        [fieldToUpdate]: arrayRemove(gasto)
+      });
+
+      console.log("✅ Gasto eliminado correctamente de Firestore");
+
+    } catch (error) {
+      console.error("❌ Error al eliminar el gasto:", error);
+      throw error;
+    }
   }
 
   // Obtener el plan del usuario

@@ -1,7 +1,16 @@
 <div class="plan min-h-screen py-20 flex flex-col justify-center text-white items-center px-8">
-  <div class="w-full flex {{ step === 1 ? 'justify-end' : ( step == 2 ? 'justify-between' : 'justify-start' ) }} items-center">
-    <BackBtn *ngIf="step > 1" (click)="changeStep(step - 1)" class="text-white mb-5" [texto]="'Paso ' + (step - 1)"></BackBtn>
-    <NextBtn *ngIf="step < 3 && existingPlan" (click)="changeStep(step + 1)" class="text-white mb-5" [texto]="'Paso ' + (step + 1)"></NextBtn>
+  <div class="w-full flex {{ step === 1 ? 'justify-between' : ( step == 2 ? 'justify-between' : 'justify-between' ) }} items-center mb-5">
+    <div class="flex-1 justify-start flex">
+      <BackBtn *ngIf="step > 1" (click)="changeStep(step - 1)" class="text-white"></BackBtn>
+    </div>
+    <div class="flex-1 justify-center flex">
+      <a href="/inicio" class="btn_small">
+        <i class="ri-home-2-fill"></i>
+      </a>
+    </div>
+    <div class="flex-1 justify-end flex">
+      <NextBtn *ngIf="step < 3 && existingPlan" (click)="changeStep(step + 1)" class="text-white"></NextBtn>
+    </div>
   </div>
   <h2 class="text-2xl font-bold mb-4 text-white">{{ title }}</h2>
 
@@ -48,7 +57,7 @@
 
     <div class="my-1 flex flex-col gap-y-1">
       <label for="valor">Valor</label>
-      <input formControlName="valor" id="valor" type="text" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
+      <input formControlName="valor" id="valor" type="number" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
       <span *ngIf="planForm.controls['valor'].invalid && planForm.controls['valor'].touched"
         class="text-red-500">Tienes que rellenar este campo</span>
     </div>
@@ -68,13 +77,13 @@
           <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
           <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
           <td class="border border-gray-500 px-4 py-2 text-center">
-            <i class="text-red-500 ri-delete-bin-fill"></i>
+            <i (click)="deleteGasto(gasto, 'fijo')" class="text-red-500 cursor-pointer hover:text-white transition-all ri-delete-bin-fill"></i>
           </td>
         </tr>
       </table>
     </div>
 
-    <button type="button" (click)="guardarPlan()" [disabled]="gastos.length === 0" class="btn mt-4">Guardar y continuar</button>
+    <button type="button" #btn (click)="guardarPlan(btn)" [disabled]="newGastos.length === 0" class="btn mt-4">Guardar y continuar</button>
   </form>
 
   <!-- Paso 3: Añadir Gastos -->
@@ -100,7 +109,7 @@
 
     <div class="my-1 flex flex-col gap-y-1">
       <label for="valor">Valor</label>
-      <input formControlName="valor" id="valor" type="text" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
+      <input formControlName="valor" id="valor" type="number" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
       <span *ngIf="planForm.controls['valor'].invalid && planForm.controls['valor'].touched"
         class="text-red-500">Tienes que rellenar este campo</span>
     </div>
@@ -120,12 +129,12 @@
           <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
           <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
           <td class="border border-gray-500 px-4 py-2 text-center">
-            <i class="text-red-500 ri-delete-bin-fill"></i>
+            <i (click)="deleteGasto(gasto, 'variable')" class="text-red-500 cursor-pointer hover:text-white transition-all ri-delete-bin-fill"></i>
           </td>
         </tr>
       </table>
     </div>
 
-    <button type="button" (click)="guardarGastos()" [disabled]="gastosVariables.length === 0" class="btn mt-4">Guardar Plan</button>
+    <button type="button" #btn (click)="guardarGastos(btn)" [disabled]="newGastosVariables.length === 0" class="btn mt-4">Guardar Plan</button>
   </form>
 </div>
