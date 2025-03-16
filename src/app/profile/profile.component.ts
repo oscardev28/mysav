@@ -48,13 +48,14 @@ export class ProfileComponent {
 
   async ngOnInit() {
     let user = await this.userService.getUser();
+    console.log('user', user)
 
     this.profileForm.patchValue({
       name: user?.name,
       lastname: user?.lastname,
       age: user?.age,
       nick: user?.nick,
-      photoURL: user.photoURL || 'assets/default-avatar.png'
+      photoURL: user.photoURL || 'assets/img/usuario.webp'
     });
 
     console.log(this.profileForm.value.photoURL)

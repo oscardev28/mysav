@@ -18,6 +18,10 @@ export class UserService {
     const userSnap = await getDoc(userDocRef);
     const userData = userSnap.data();
 
+    if (userData && !userData['photoURL']) {
+      userData['photoURL'] = user.photoURL || 'assets/img/usuario.webp';
+    }
+
     console.log('user data', userData)
 
     return userData;
