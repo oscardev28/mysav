@@ -73,9 +73,9 @@
           <th class="border border-gray-500 px-4 py-2">Eliminar</th>
         </tr>
         <tr *ngFor="let gasto of gastos">
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.nombre }}</td>
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.name }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.type }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.value }}€</td>
           <td class="border border-gray-500 px-4 py-2 text-center">
             <i (click)="deleteGasto(gasto, 'fijo')" class="text-red-500 cursor-pointer hover:text-white transition-all ri-delete-bin-fill"></i>
           </td>
@@ -125,9 +125,9 @@
           <th class="border border-gray-500 px-4 py-2">Eliminar</th>
         </tr>
         <tr *ngFor="let gasto of gastosVariables">
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.nombre }}</td>
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.tipo }}</td>
-          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.valor }}€</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.name }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.type }}</td>
+          <td class="border border-gray-500 px-4 py-2 text-center">{{ gasto.value }}€</td>
           <td class="border border-gray-500 px-4 py-2 text-center">
             <i (click)="deleteGasto(gasto, 'variable')" class="text-red-500 cursor-pointer hover:text-white transition-all ri-delete-bin-fill"></i>
           </td>

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { UserModel } from '../models/user';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Importa Router
+import { Router } from '@angular/router';
+import { UserRegisterModel } from '../models/user.model';
 
 @Component({
   imports: [FormsModule, CommonModule],
@@ -12,33 +12,42 @@ import { Router } from '@angular/router'; // Importa Router
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-
 export class RegisterComponent {
-  public user: UserModel = new UserModel('', '', '', '', '');
+  public user: UserRegisterModel = {
+    name: '',
+    lastname: '',
+    nick: '',
+    email: '',
+    password: '',
+    age: null,
+    photoURL: ''
+  };
+
   public errorMessage: string = '';
   public showPassword: boolean = false;
 
-  constructor(private authService: AuthService,  private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
   async onSubmit(form: any) {
-    this.errorMessage = ''; // Resetea el mensaje de error
+    this.errorMessage = '';
+
     try {
       await this.authService.register(this.user);
       console.log('Usuario registrado correctamente');
-      // Intentar iniciar sesión después del registro
+
       const userCredential = await this.authService.login(this.user.email, this.user.password);
 
       if (userCredential) {
         console.log('Usuario logueado correctamente');
-        this.router.navigate(['/']); // Redirigir solo si el login es exitoso
+        this.router.navigate(['/']);
       }
     } catch (error: any) {
       console.error('Error al registrar:', error);
-      this.errorMessage = this.getErrorMessage(error.code); // Captura el mensaje de error
+      this.errorMessage = this.getErrorMessage(error.code);
     }
   }
 

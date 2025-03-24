@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Auth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from '@angular/fire/auth';
+import { UserModel } from '../models/user.model';
 
 interface Error {
   state: boolean,
@@ -12,33 +13,38 @@ interface Error {
 
 @Component({
   selector: 'app-profile',
-  imports: [ ReactiveFormsModule, CommonModule ],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-
 export class ProfileComponent {
   error: Error = {
     state: false,
     text: 'Error'
   }
+
   profileForm = new FormGroup({
-    name: new FormControl(''),
-    lastname: new FormControl(''),
-    age: new FormControl(''),
-    nick: new FormControl(''),
-    photoURL: new FormControl('')
+    name: new FormControl<string>(''),
+    lastname: new FormControl<string>(''),
+    age: new FormControl<number | null>(null), // <- Aquí cambia el tipo
+    nick: new FormControl<string>(''),
+    photoURL: new FormControl<string>(''),
   });
+
   passForm: FormGroup;
   selectedFile: File | null = null;
-  previewUrl: any = null; // Para la previsualización de la imagen
+  previewUrl: any = null;
+
   showPassword: boolean = false;
   showPassword2: boolean = false;
   showPassword3: boolean = false;
-
   changePass: boolean = false;
 
-  constructor(private fb: FormBuilder, private userService: UserService, private auth: Auth) {
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private auth: Auth
+  ) {
     this.passForm = this.fb.group({
       lastPassword: ['', [Validators.required]],
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
@@ -47,18 +53,18 @@ export class ProfileComponent {
   }
 
   async ngOnInit() {
-    let user = await this.userService.getUser();
-    console.log('user', user)
+    const user = await this.userService.getUser();
+    console.log('user', user);
 
     this.profileForm.patchValue({
-      name: user?.name,
-      lastname: user?.lastname,
-      age: user?.age,
-      nick: user?.nick,
-      photoURL: user.photoURL || 'assets/img/usuario.webp'
+      name: user?.name || '',
+      lastname: user?.lastname || '',
+      age: user?.age ?? null,
+      nick: user?.nick || '',
+      photoURL: user?.photoURL || 'assets/img/usuario.webp'
     });
 
-    console.log(this.profileForm.value.photoURL)
+    this.previewUrl = user?.photoURL || 'assets/img/usuario.webp';
   }
 
   async changePassword() {
@@ -75,18 +81,15 @@ export class ProfileComponent {
     }
 
     const user = this.auth.currentUser;
-    if (!user) {
+    if (!user || !user.email) {
       alert('❌ No hay usuario autenticado.');
       return;
     }
 
     try {
-      // Reautenticación del usuario antes de cambiar la contraseña
-      const credential = EmailAuthProvider.credential(user.email!, lastPassword);
+      const credential = EmailAuthProvider.credential(user.email, lastPassword!);
       await reauthenticateWithCredential(user, credential);
-
-      // Cambiar la contraseña
-      await updatePassword(user, newPassword);
+      await updatePassword(user, newPassword!);
       alert('Contraseña actualizada con éxito.');
       this.passForm.reset();
     } catch (error: any) {
@@ -95,7 +98,7 @@ export class ProfileComponent {
       } else if (error.code === 'auth/too-many-requests') {
         alert('⚠️ Has intentado demasiadas veces. Inténtalo más tarde.');
       } else {
-        alert('❌ Error al cambiar la contraseña: ' + error.message + '--' + error.code);
+        alert('❌ Error al cambiar la contraseña: ' + error.message);
       }
     }
   }
@@ -104,14 +107,13 @@ export class ProfileComponent {
     this.changePass = !this.changePass;
     const icon = el.querySelector('i');
     if (icon) {
-      console.log('icon', icon)
       icon.style.transform = this.changePass ? 'rotate(180deg)' : 'rotate(0deg)';
       icon.style.transition = 'transform 0.3s ease';
     }
   }
 
   togglePassword(value: number = 1) {
-    switch(value) {
+    switch (value) {
       case 1:
         this.showPassword = !this.showPassword;
         break;
@@ -122,7 +124,7 @@ export class ProfileComponent {
         this.showPassword3 = !this.showPassword3;
         break;
       default:
-        console.error('Ha ocurrido un error')
+        console.error('Ha ocurrido un error');
     }
   }
 
@@ -134,8 +136,6 @@ export class ProfileComponent {
     const file: File = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-
-      // Previsualizar la imagen antes de subirla
       const reader = new FileReader();
       reader.onload = () => {
         this.previewUrl = reader.result as string;
@@ -145,13 +145,15 @@ export class ProfileComponent {
   }
 
   async onSubmit() {
-    console.warn(this.profileForm.value);
     try {
-      const userData = this.profileForm.value;
+      const userData = this.profileForm.value as Partial<UserModel>;
       await this.userService.updateUserProfile(userData, this.selectedFile);
-      alert("Perfil actualizado correctamente");
+      alert("✅ Perfil actualizado correctamente");
     } catch (error: any) {
-      this.error = error.message;
+      this.error = {
+        state: true,
+        text: error.message || 'Ocurrió un error al actualizar el perfil'
+      };
     }
   }
 }

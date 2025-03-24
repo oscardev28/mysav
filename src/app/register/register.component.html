@@ -10,6 +10,7 @@
     <input required name="name" #name="ngModel" [(ngModel)]="user.name" placeholder="Nombre" class="border p-2 mb-2 w-64 outline-none {{ (!name.valid && name.touched) ? 'border-2 border-red-500' : '' }}">
     <input required name="lastname" #lastname="ngModel" [(ngModel)]="user.lastname" placeholder="Apellidos" class="border p-2 mb-2 w-64 outline-none {{ (!lastname.valid && lastname.touched) ? 'border-2 border-red-500' : '' }}">
     <input required name="nick" #nick="ngModel" [(ngModel)]="user.nick" placeholder="Nombre de usuario" class="border p-2 mb-2 w-64 outline-none {{ (!nick.valid && nick.touched) ? 'border-2 border-red-500' : '' }}">
+    <input required type="number" name="age" #age="ngModel" [(ngModel)]="user.age" placeholder="Edad" class="border p-2 mb-2 w-64 outline-none {{ (!age.valid && age.touched) ? 'border-2 border-red-500' : '' }}">
     <input required name="email" #email="ngModel" [(ngModel)]="user.email" placeholder="Correo" class="border p-2 mb-2 w-64 outline-none {{ (!email.valid && email.touched) ? 'border-2 border-red-500' : '' }}">
     <div class="relative w-64">
       <input

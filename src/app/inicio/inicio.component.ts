@@ -94,6 +94,8 @@ export class InicioComponent implements OnInit {
   async cargarPlan() {
     this.plan = await this.planService.cargarPlan(this.currentMonth, this.currentYear);
 
+    console.log('Plan:', this.plan);
+
     if (!this.plan) {
       this.router.navigate(['/plan']);
     } else {
@@ -118,8 +120,8 @@ export class InicioComponent implements OnInit {
     this.ingresos = this.plan.ingresos || 0;
     this.ahorro = this.plan.ahorro || 0;
 
-    this.fijos = this.plan.gastos.reduce((acc: number, gasto: any) => acc + Number(gasto.valor), 0);
-    this.variables = this.plan.gastosVariables.reduce((acc: number, gasto: any) => acc + Number(gasto.valor), 0);
+    this.fijos = this.plan.gastos.reduce((acc: number, gasto: any) => acc + Number(gasto.value), 0);
+    this.variables = this.plan.gastosVariables.reduce((acc: number, gasto: any) => acc + Number(gasto.value), 0);
     this.totalGasto = this.fijos + this.variables;
     this.porcentajeTotalGasto = (this.totalGasto / this.ingresos) * 100;
 

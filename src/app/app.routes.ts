@@ -7,6 +7,7 @@ import { AuthGuard } from './auth.guard';
 import { NoAuthGuard } from './no-auth.guard'; // Evita que usuarios logueados accedan a login/register
 import { PlanComponent } from './plan/plan.component';
 import { ProfileComponent } from './profile/profile.component';
+import { CalculateComponent } from './calculate/calculate.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent, canActivate: [NoAuthGuard]},
@@ -16,5 +17,6 @@ export const routes: Routes = [
   {path: 'inicio', component: InicioComponent, canActivate: [AuthGuard]},
   {path: 'plan', component: PlanComponent, canActivate: [AuthGuard]},
   {path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  {path: 'calculate', component: CalculateComponent, canActivate: [AuthGuard]},
 ];
 

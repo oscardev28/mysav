@@ -1,4 +1,4 @@
-<section [@slideAnimation]="animationDirection" *ngIf="!animating" class="px-5 m-auto lg:w-4/5 w-full overflow-hidden h-screen max-w-screen flex flex-col justify-center items-center">
+<section [@slideAnimation]="animationDirection" *ngIf="!animating" class="px-5 py-20 lg:w-4/5 w-full overflow-hidden min-h-screen max-w-screen flex flex-col justify-center items-center">
   <a href="/plan" class="btn font-bold text-xs mt-8 mb-10">Mi plan</a>
   <!--<button (click)="generarDatos()" class="btn font-bold text-xs absolute top-20 left-2">
     Generar Gastos Aleatorios
@@ -66,9 +66,9 @@
             <td class="border border-gray-300 px-1 py-2 font-bold text-white text-center" colspan="3">FIJOS</td>
           </tr>
           <tr *ngFor="let gasto of plan.gastos" class="border border-gray-300">
-            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.fecha) }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.nombre }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.valor }}€</td>
+            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
           </tr>
 
           <tr class="bg-green-500">
@@ -76,9 +76,9 @@
           </tr>
 
           <tr *ngFor="let gasto of plan.gastosVariables" class="border border-gray-300">
-            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.fecha) }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.nombre }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.valor }}€</td>
+            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
+            <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
           </tr>
         </tbody>
       </table>
