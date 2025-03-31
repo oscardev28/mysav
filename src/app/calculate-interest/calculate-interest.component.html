@@ -1,14 +1,17 @@
 <form [formGroup]="interestForm" class="[&>input]:w-full [&>div]:w-full w-full flex flex-col items-center text-white">
   <div class="my-2 flex flex-col gap-y-2">
-    <label for="capital">Capital inicial</label>
-    <input formControlName="capital" id="capital" type="number" placeholder="Capital inicial"
-      class="border text-black p-2 mb-2 w-full outline-none">
+    <label class="font-bold" for="capital">Capital inicial</label>
+    <div class="flex">
+      <div class="bg-gradient text-white px-4 flex font-bold mb-2 items-center justify-center">€</div>
+      <input formControlName="capital" id="capital" type="number" placeholder="Capital inicial"
+        class="border text-black p-2 mb-2 w-full outline-none">
+    </div>
     <span *ngIf="interestForm.controls['capital'].invalid && interestForm.controls['capital'].touched"
       class="text-red-500">Tienes que rellenar este campo</span>
   </div>
 
   <div class="my-1 flex flex-col gap-y-1">
-    <label for="period">Periodicidad</label>
+    <label class="font-bold" for="period">Periodicidad</label>
     <select formControlName="period" id="period" class="border text-black p-2 mb-2 w-full outline-none">
       <option *ngFor="let item of period; let i = index" [selected]="i === 0" [value]="item">
         {{ item }}
@@ -19,22 +22,31 @@
   </div>
 
   <div class="my-2 flex flex-col gap-y-2">
-    <label for="amount">Cantidad periodica</label>
-    <input formControlName="amount" id="amount" type="number" placeholder="100" class="border text-black p-2 mb-2 w-full outline-none">
+    <label class="font-bold" for="amount">Cantidad periodica</label>
+    <div class="flex">
+      <div class="bg-gradient text-white px-4 flex font-bold mb-2 items-center justify-center">€</div>
+      <input formControlName="amount" id="amount" type="number" placeholder="100" class="border text-black p-2 mb-2 w-full outline-none">
+    </div>
     <span *ngIf="interestForm.controls['amount'].invalid && interestForm.controls['amount'].touched"
       class="text-red-500">Tienes que rellenar este campo</span>
   </div>
 
   <div class="my-2 flex flex-col gap-y-2">
-    <label for="interest">Interés</label>
-    <input formControlName="interest" id="interest" type="number" placeholder="8%" class="border text-black p-2 mb-2 w-full outline-none">
+    <label class="font-bold" for="interest">Interés</label>
+    <div class="flex">
+      <div class="bg-gradient text-white px-4 flex font-bold mb-2 items-center justify-center">%</div>
+      <input formControlName="interest" id="interest" type="number" placeholder="8%" class="border text-black p-2 mb-2 w-full outline-none">
+    </div>
     <span *ngIf="interestForm.controls['interest'].invalid && interestForm.controls['interest'].touched"
       class="text-red-500">Tienes que rellenar este campo</span>
   </div>
 
   <div class="my-2 flex flex-col gap-y-2">
-    <label for="duration">Duración</label>
-    <input formControlName="duration" id="duration" type="number" placeholder="1" class="border text-black p-2 mb-2 w-full outline-none">
+    <label class="font-bold" for="duration">Duración</label>
+    <div class="flex">
+      <div class="bg-gradient text-white px-4 flex font-bold mb-2 items-center justify-center">Años</div>
+      <input formControlName="duration" id="duration" type="number" placeholder="1" class="border text-black p-2 mb-2 w-full outline-none">
+    </div>
     <span *ngIf="interestForm.controls['duration'].invalid && interestForm.controls['duration'].touched"
       class="text-red-500">Tienes que rellenar este campo</span>
   </div>
@@ -43,23 +55,25 @@
     class="btn mt-4">Calcular</button>
 </form>
 
-<div *ngIf="result" class="mt-10">
-  <div class="my-5 flex flex-wrap justify-around">
-    <div class="my-1 lg:w-min w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
+<div *ngIf="result" class="mt-10 flex flex-col items-center">
+  <div class="my-5 flex lg:flex-nowrap flex-wrap justify-around lg:w-2/3">
+    <div class="my-1 min-w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
       <strong class="text-black">Total</strong>
       <span class="text-gradient text-md">{{result.totalSaved | number:'1.0-2' }} €</span>
     </div>
 
-    <div class="my-1 lg:w-min w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
+    <div class="my-1 min-w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
       <strong class="text-black">Invertido</strong>
       <span class="text-gradient text-md">{{result.totalDeposited | number:'1.0-2' }} €</span>
     </div>
 
-    <div class="my-1 lg:w-min w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
+    <div class="my-1 min-w-1/3 p-3 bg-white rounded-xl mx-1 flex flex-col items-center justify-center">
       <strong class="text-black">Intereses</strong>
       <span class="text-gradient text-md">{{result.interestEarned | number:'1.0-2' }} €</span>
     </div>
   </div>
   <div class="my-3 text-white text-center font-bold">Al cabo de {{ interestForm.controls['duration'].value }} años habrás ahorrado <span class="text-white text-2xl">{{result.totalSaved | number:'1.0-2'}} €</span></div>
-  <canvas id="donutChart" width="400" height="400"></canvas>
+  <div class="flex justify-center w-full">
+    <canvas id="donutChart" class="lg:w-1/2 w-full"></canvas>
+  </div>
 </div>

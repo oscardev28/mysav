@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, updateDoc, getDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
+import { GastoModel } from '../models/expense.model';
 
 @Injectable({
   providedIn: 'root'
@@ -8,64 +9,81 @@ import { Auth } from '@angular/fire/auth';
 export class GastosService {
   constructor(private firestore: Firestore, private auth: Auth) {}
 
-  async generarGastosAleatorios() {
-    const user = this.auth.currentUser;
-    if (!user) {
-      console.error('⚠️ No hay usuario autenticado');
-      return;
-    }
-
-    const userDocRef = doc(this.firestore, 'users', user.uid);
-    const userSnap = await getDoc(userDocRef);
-    const userData = userSnap.data() as { planId?: string };
-
-    if (!userData?.planId) {
-      throw new Error("No se encontró un plan asociado a este usuario");
-    }
-
-    const planRef = doc(this.firestore, 'plans', userData.planId);
-
-    console.log(planRef);
-    const planSnap = await getDoc(planRef);
-
-    if (!planSnap.exists()) {
-      console.error('⚠️ No se encontró el plan del usuario');
-      return;
-    }
-
-    let planData = planSnap.data();
-    let gastosVariables = planData['gastosVariables'] || [];
-
-    const diasDelMes = Array.from({ length: 30 }, (_, i) => i + 1); // Días 1-30
-    const diasSinGasto = this.obtenerDiasSinGasto(5, 30); // 5 días sin gasto
-
-    for (let dia of diasDelMes) {
-      if (diasSinGasto.includes(dia)) continue; // Saltar estos días
-
-      // Aquí usamos la función obtenerFechaActualConDia para generar la fecha
-      const fecha = this.obtenerFechaActualConDia(2024, 2, dia); // Generamos la fecha con el formato adecuado
-
-      const gasto = {
-        nombre: this.generarNombreAleatorio(),
-        tipo: this.generarTipoAleatorio(),
-        valor: this.generarValorAleatorio(),
-        fecha: fecha // La fecha con formato "YYYY-MM-DD HH:mm:ss"
-      };
-
-      gastosVariables.push(gasto);
-    }
-
-    await updateDoc(planRef, { gastosVariables }); // Guardar en Firestore
-    console.log('📤 Gastos aleatorios añadidos en gastosVariables del plan');
+  private obtenerMesActual(): string {
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    return `${año}-${mes}`; // Formato "YYYY-MM"
   }
 
-  private obtenerDiasSinGasto(cantidad: number, maxDia: number): number[] {
-    const dias: number[] = [];
-    while (dias.length < cantidad) {
-      const randomDia = Math.floor(Math.random() * maxDia) + 1;
-      if (!dias.includes(randomDia)) dias.push(randomDia);
+  async generarGastosAleatorios() {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Usuario no autenticado");
+
+    const ahora = new Date();
+
+    const tiposDeGasto = [
+      "Alquiler/Hipoteca", "Supermercado", "Internet", "Teléfono", "Gasolina", "Coche", "Suscripciones", "Seguro", "Luz", "Agua", "Gimnasio",
+      "Transporte público", "Vacaciones"
+    ];
+
+    const tiposDeGastoVariable = [
+      "Comer fuera", "Compras", "Ocio", "Salud", "Transporte", "Tecnología", "Viajes"
+    ];
+
+    for (let i = 0; i < 3; i++) {
+      const fecha = new Date(ahora.getFullYear(), ahora.getMonth() + i);
+      const año = fecha.getFullYear();
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const fechaClave = `${año}-${mes}`;
+      const fechaInicioMes = `${fechaClave}-01`;
+
+      const ingresos = Math.floor(Math.random() * 2000) + 1000;
+      const ahorro = Math.floor(Math.random() * 500);
+
+      const gastos: GastoModel[] = Array.from({ length: 5 }).map(() => ({
+        id: crypto.randomUUID(),
+        name: tiposDeGasto[Math.floor(Math.random() * tiposDeGasto.length)],
+        category: 'General',
+        type: 'fijo',
+        value: Math.floor(Math.random() * 500) + 100,
+        date: fechaInicioMes
+      }));
+
+      const gastosVariables: GastoModel[] = Array.from({ length: 8 }).map(() => ({
+        id: crypto.randomUUID(),
+        name: tiposDeGastoVariable[Math.floor(Math.random() * tiposDeGastoVariable.length)],
+        category: 'Extra',
+        type: 'variable',
+        value: Math.floor(Math.random() * 300) + 20,
+        date: `${fechaClave}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`
+      }));
+
+      const planRef = doc(this.firestore, `users/${user.uid}/planes/${fechaClave}`);
+
+      await setDoc(planRef, {
+        ingresos,
+        ahorro,
+        gastos,
+        gastosVariables
+      }, { merge: true });
     }
-    return dias;
+  }
+
+  async añadirGasto(nuevosGastos: GastoModel[], tipo: 'fijo' | 'variable' = 'variable') {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Usuario no autenticado");
+
+    const fechaActual = this.obtenerMesActual();
+    const planRef = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
+
+    const gastosConID = nuevosGastos.map(gasto => ({ ...gasto, id: crypto.randomUUID() }));
+
+    for (const gasto of gastosConID) {
+      await updateDoc(planRef, {
+        [tipo === 'fijo' ? 'gastos' : 'gastosVariables']: arrayUnion(gasto)
+      });
+    }
   }
 
   private generarNombreAleatorio(): string {

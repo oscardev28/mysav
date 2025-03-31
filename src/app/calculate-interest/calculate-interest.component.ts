@@ -23,7 +23,7 @@ export class CalculateInterestComponent {
   ) {
     this.interestForm = this.fb.group({
       capital: ['', [Validators.required, Validators.min(0)]],
-      period: ['', [Validators.required]],
+      period: ['Mensual', [Validators.required]],
       amount: ['', [Validators.required, Validators.min(1)]],
       interest: ['', [Validators.required, Validators.min(0)]],
       duration: ['', [Validators.required, Validators.min(1)]],
@@ -115,7 +115,7 @@ export class CalculateInterestComponent {
         }]
       },
       options: {
-        responsive: true,
+        responsive: false,
         plugins: {
           legend: {
             position: 'top',

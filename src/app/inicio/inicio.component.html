@@ -1,4 +1,4 @@
-<section [@slideAnimation]="animationDirection" *ngIf="!animating" class="px-5 py-20 lg:w-4/5 w-full overflow-hidden min-h-screen max-w-screen flex flex-col justify-center items-center">
+<section [@slideAnimation]="animationDirection" *ngIf="!animating" class="lg:px-20 px-5 py-20 w-full overflow-hidden min-h-screen max-w-screen flex flex-col justify-center items-center">
   <a href="/plan" class="btn font-bold text-xs mt-8 mb-10">Mi plan</a>
   <!--<button (click)="generarDatos()" class="btn font-bold text-xs absolute top-20 left-2">
     Generar Gastos Aleatorios
@@ -11,7 +11,7 @@
   </div>
 
   <div *ngIf="remainingMoney < 100 && remainingMoney > 0" class="flex items-center bg-orange-400 opacity-80 my-5 rounded-xl text-white p-2 text-sm"><i class="text-2xl mr-3 ri-alert-fill"></i>¡Cuidado! Te quedan menos de 100€ para llegar a tu límite mensual</div>
-  <div *ngIf="remainingMoney <= 0" class="flex items-center bg-red-400 opacity-80 my-5 rounded-xl text-white p-2 text-sm"><i class="text-2xl mr-3 ri-error-warning-fill"></i>¡Has superado tu límite mensual!</div>
+  <div *ngIf="remainingMoney <= 0" class="flex items-center bg-red-400 opacity-80 my-5 rounded-xl text-white p-2 text-sm"><i class="text-2xl mr-3 ri-error-warning-fill"></i>¡Has superado tu límite mensual, lo excedes en <strong class="mx-1">{{ -remainingMoney }}€</strong>!</div>
 
   <article id="progress" class="my-5 w-full">
     <!-- Barra de progreso -->
@@ -37,10 +37,10 @@
         <span class="flex items-center"><div class="w-4 h-4 my-1 bg-red-500 mr-2"></div>{{ porcentajeAhorro | number:'1.0-0' }}% Ahorro</span>
       </div>
       <div class="w-full flex flex-col text-sm font-bold text-white">
+        <span>Ingresos: {{ ingresos }} €</span>
+        <span>Ahorro: {{ ahorro }} €</span>
         <span>Dinero gastado: {{ totalGasto }} €</span>
         <span>Dinero restante: {{ remainingMoney }} €</span>
-        <span>Ahorro: {{ ahorro }} €</span>
-        <span></span>
       </div>
     </div>
   </article>

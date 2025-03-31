@@ -55,6 +55,7 @@ export class InicioComponent implements OnInit {
 
   async ngOnInit() {
     try {
+      //this.generarDatos()
       await this.cargarPlan();
       this.getRemainingMoney();
       this.title = `${this.helper.getMonthName().toUpperCase()} -  ${this.helper.getYear()}`

@@ -101,7 +101,7 @@ export class PlanComponent implements OnInit {
 
   agregarGasto() {
     const nuevoGasto = new GastoModel(
-      '',
+      crypto.randomUUID(),
       this.planForm.value.nombre,
       this.planForm.value.tipo,
       'fijo',
@@ -115,7 +115,7 @@ export class PlanComponent implements OnInit {
 
   agregarGastoVariable() {
     const nuevoGasto = new GastoModel(
-      '',
+      crypto.randomUUID(),
       this.planForm.value.nombre,
       this.planForm.value.tipo,
       'variable',
