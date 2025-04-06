@@ -64,3 +64,6 @@ body {
 .text-gradient-hover:hover {
   opacity: 0.7; /* Ajusta el efecto de hover */
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

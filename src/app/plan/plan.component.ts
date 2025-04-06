@@ -8,6 +8,10 @@ import { Router } from '@angular/router';
 import { BackBtnComponent } from '../buttons/back-btn/back-btn.component';
 import { NextBtnComponent } from '../buttons/next-btn/next-btn.component';
 import { GastoModel } from '../models/expense.model';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalDialogComponent } from '../modal/modal.component';
+import { firstValueFrom } from 'rxjs';
+import { LoaderService } from '../services/loader.service';
 
 @Component({
   selector: 'app-plan',
@@ -16,6 +20,7 @@ import { GastoModel } from '../models/expense.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, BackBtnComponent, NextBtnComponent]
 })
+
 export class PlanComponent implements OnInit {
   existingPlan: boolean = false;
   planForm: FormGroup;
@@ -41,7 +46,9 @@ export class PlanComponent implements OnInit {
     private fb: FormBuilder,
     private planService: PlanService,
     private router: Router,
-    public helper: Helper
+    public helper: Helper,
+    private dialog: MatDialog,
+    private loader: LoaderService
   ) {
     this.planForm = this.fb.group({
       ingresos: ['', [Validators.required, Validators.min(1)]],
@@ -56,8 +63,19 @@ export class PlanComponent implements OnInit {
     this.obtenerPlan();
   }
 
+  openModal(title: string, message: string, showActions: boolean = false) {
+    const dialogRef = this.dialog.open(ModalDialogComponent, {
+      data: {
+        title: title,
+        message: message,
+        showActions: showActions
+      }
+    });
+  }
+
   async obtenerPlan() {
     try {
+      this.loader.show();
       const plan = await this.planService.obtenerPlanActual();
       if (plan) {
         this.existingPlan = true;
@@ -73,6 +91,7 @@ export class PlanComponent implements OnInit {
     } catch (error) {
       console.error("Error al obtener plan:", error);
     }
+    this.loader.hide();
   }
 
   changeStep(step: number) {
@@ -128,40 +147,79 @@ export class PlanComponent implements OnInit {
   }
 
   async deleteGasto(gasto: GastoModel, tipo: 'fijo' | 'variable') {
-    if (confirm('¿Seguro que quieres eliminar este gasto?')) {
+    // Si el gasto está en los arrays temporales (sin guardar aún)
+    if (tipo === 'fijo' && this.newGastos.some(g => g.id === gasto.id)) {
+      this.newGastos = this.newGastos.filter(g => g.id !== gasto.id);
+      this.gastos = this.gastos.filter(g => g.id !== gasto.id);
+      return;
+    }
+
+    if (tipo === 'variable' && this.newGastosVariables.some(g => g.id === gasto.id)) {
+      this.newGastosVariables = this.newGastosVariables.filter(g => g.id !== gasto.id);
+      this.gastosVariables = this.gastosVariables.filter(g => g.id !== gasto.id);
+      return;
+    }
+
+    // Si ya está guardado en Firebase, mostrar confirmación y eliminar
+    const dialogRef = this.dialog.open(ModalDialogComponent, {
+      data: {
+        title: '¿Eliminar gasto?',
+        message: '¿Seguro que quieres eliminar este gasto?',
+        showActions: true
+      }
+    });
+
+    const result = await firstValueFrom(dialogRef.afterClosed());
+
+    if (result) {
       try {
-        await this.planService.eliminarGasto(gasto!, tipo);
-        this.obtenerPlan();
+        this.loader.show();
+        await this.planService.eliminarGasto(gasto, tipo);
+        await this.obtenerPlan();
       } catch (error) {
         console.error('Error al eliminar el gasto:', error);
       }
+      this.loader.hide();
     }
   }
 
   async guardarPlan(btn: HTMLButtonElement) {
+    if(this.newGastos.length === 0) {
+      this.openModal('No hay gastos', 'No has añadido ningún gasto fijo.');
+      return;
+    }
     btn.disabled = true;
     try {
+      this.loader.show();
       await this.planService.guardarPlan(this.ingresos, this.ahorro, this.newGastos, this.newGastosVariables);
       this.newGastos = [];
       this.newGastosVariables = [];
-      alert('Plan de gastos guardado con éxito');
+      this.openModal('Plan guardado', 'Tu plan ha sido guardado correctamente.');
       this.step = 3;
       this.title = 'Añade tus gastos adicionales';
     } catch (error) {
       console.error("Error al guardar el plan:", error);
     }
+    this.loader.hide();
     btn.disabled = false;
   }
 
   async guardarGastos(btn: HTMLButtonElement) {
+    if(this.newGastosVariables.length === 0) {
+      this.openModal('No hay gastos', 'No has añadido ningún gasto adicional.');
+      return;
+    }
     btn.disabled = true;
     try {
+      this.loader.show();
       await this.planService.añadirGasto(this.newGastosVariables);
       this.newGastosVariables = [];
-      alert('Guardado correctamente');
+      this.openModal('Gastos guardados', 'Tus gastos adicionales han sido guardados correctamente.');
+      this.router.navigate(['/inicio']);
     } catch (error) {
       console.error("Error al guardar los gastos adicionales:", error);
     }
+    this.loader.hide();
     btn.disabled = false;
   }
 }

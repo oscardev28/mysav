@@ -83,7 +83,7 @@
       </table>
     </div>
 
-    <button type="button" #btn (click)="guardarPlan(btn)" [disabled]="newGastos.length === 0" class="btn mt-4">Guardar y continuar</button>
+    <button type="button" #btn (click)="guardarPlan(btn)" class="btn mt-4">Guardar y continuar</button>
   </form>
 
   <!-- Paso 3: Añadir Gastos -->
@@ -135,6 +135,6 @@
       </table>
     </div>
 
-    <button type="button" #btn (click)="guardarGastos(btn)" [disabled]="newGastosVariables.length === 0" class="btn mt-4">Guardar Plan</button>
+    <button type="button" #btn (click)="guardarGastos(btn)" class="btn mt-4">Guardar Plan</button>
   </form>
 </div>

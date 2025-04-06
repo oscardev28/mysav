@@ -51,6 +51,12 @@ export class Helper {
     return meses[currentMonth];
   }
 
+  devLog(...args: any[]) {
+    if (window.location.hostname === 'localhost') {
+      console.log(...args);
+    }
+  }
+
   getYear() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();

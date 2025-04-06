@@ -5,6 +5,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Auth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from '@angular/fire/auth';
 import { UserModel } from '../models/user.model';
+import { ImageCropperComponent } from 'ngx-image-cropper';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { LoaderService } from '../services/loader.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalDialogComponent } from '../modal/modal.component';
 
 interface Error {
   state: boolean,
@@ -13,7 +18,7 @@ interface Error {
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ImageCropperComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -40,10 +45,15 @@ export class ProfileComponent {
   showPassword3: boolean = false;
   changePass: boolean = false;
 
+  imageChangedEvent: any = '';
+  croppedImage: string = '';
+
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private auth: Auth
+    private auth: Auth,
+    private loader: LoaderService,
+    private dialog: MatDialog
   ) {
     this.passForm = this.fb.group({
       lastPassword: ['', [Validators.required]],
@@ -67,40 +77,52 @@ export class ProfileComponent {
     this.previewUrl = user?.photoURL || 'assets/img/usuario.webp';
   }
 
+  openModal(title: string, message: string = '', showActions: boolean = false) {
+    const dialogRef = this.dialog.open(ModalDialogComponent, {
+      data: {
+        title: title,
+        message: message,
+        showActions: showActions
+      }
+    });
+  }
+
   async changePassword() {
     if (this.passForm.invalid) {
-      alert('❌ Por favor, completa todos los campos correctamente. Recuerda que la contraseña debe tener al menos 6 carácteres');
+      this.openModal('❌ Por favor, completa todos los campos correctamente. Recuerda que la contraseña debe tener al menos 6 carácteres');
       return;
     }
 
     const { lastPassword, newPassword, newPasswordRep } = this.passForm.value;
 
     if (newPassword !== newPasswordRep) {
-      alert('❌ Las contraseñas no coinciden.');
+      this.openModal('❌ Las contraseñas no coinciden.');
       return;
     }
 
     const user = this.auth.currentUser;
     if (!user || !user.email) {
-      alert('❌ No hay usuario autenticado.');
+      this.openModal('❌ No hay usuario autenticado.');
       return;
     }
 
     try {
+      this.loader.show();
       const credential = EmailAuthProvider.credential(user.email, lastPassword!);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword!);
-      alert('Contraseña actualizada con éxito.');
+      this.openModal('Contraseña actualizada con éxito.');
       this.passForm.reset();
     } catch (error: any) {
       if (error.code === 'auth/invalid-credential') {
-        alert('❌ La contraseña anterior es incorrecta.');
+        this.openModal('❌ La contraseña anterior es incorrecta.');
       } else if (error.code === 'auth/too-many-requests') {
-        alert('⚠️ Has intentado demasiadas veces. Inténtalo más tarde.');
+        this.openModal('⚠️ Has intentado demasiadas veces. Inténtalo más tarde.');
       } else {
-        alert('❌ Error al cambiar la contraseña: ' + error.message);
+        this.openModal('❌ Error al cambiar la contraseña: ' + error.message);
       }
     }
+    this.loader.hide();
   }
 
   showChangePassword(el: HTMLButtonElement) {
@@ -128,32 +150,100 @@ export class ProfileComponent {
     }
   }
 
+  transform = {
+    scale: 1,
+    rotate: 0,
+    flipH: false,
+    flipV: false
+  };
+
+  zoomIn() {
+    this.transform = {
+      ...this.transform,
+      scale: this.transform.scale + 0.1
+    };
+  }
+
+  zoomOut() {
+    this.transform = {
+      ...this.transform,
+      scale: this.transform.scale - 0.1
+    };
+  }
+
+  rotateLeft() {
+    this.transform = {
+      ...this.transform,
+      rotate: this.transform.rotate - 90
+    };
+  }
+
+  rotateRight() {
+    this.transform = {
+      ...this.transform,
+      rotate: this.transform.rotate + 90
+    };
+  }
+
   openFileInput() {
     document.getElementById('fileInput')?.click();
   }
 
   onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.previewUrl = reader.result as string;
-      };
-      reader.readAsDataURL(file);
+    this.imageChangedEvent = event;
+  }
+
+  imageCropped(event: ImageCroppedEvent) {
+    if (event.blob) {
+      this.selectedFile = new File([event.blob], 'profile.png', { type: event.blob.type });
+      this.previewUrl = URL.createObjectURL(event.blob); // Vista previa rápida
     }
   }
 
+  confirmCrop() {
+    if (!this.selectedFile) {
+      console.warn('No hay imagen recortada para confirmar');
+      return;
+    }
+    this.imageChangedEvent = ''; // Oculta el cropper
+  }
+
+  cancelCrop() {
+    this.imageChangedEvent = '';
+    this.selectedFile = null;
+    this.previewUrl = this.profileForm.value.photoURL || 'assets/img/usuario.webp';
+  }
+
+  base64ToFile(base64: string, filename: string): File {
+    const arr = base64.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  }
+
   async onSubmit() {
+    this.loader.show();
     try {
       const userData = this.profileForm.value as Partial<UserModel>;
-      await this.userService.updateUserProfile(userData, this.selectedFile);
-      alert("✅ Perfil actualizado correctamente");
+
+      const finalImage = this.croppedImage
+        ? this.base64ToFile(this.croppedImage, 'profile.png')
+        : this.selectedFile;
+
+      await this.userService.updateUserProfile(userData, finalImage);
+      this.openModal("✅ Perfil actualizado correctamente");
     } catch (error: any) {
       this.error = {
         state: true,
         text: error.message || 'Ocurrió un error al actualizar el perfil'
       };
     }
+    this.loader.hide();
   }
+
 }

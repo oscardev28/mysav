@@ -8,6 +8,7 @@ import { provideAnimations } from '@angular/platform-browser/animations'; // ✅
 import { provideStorage, getStorage } from '@angular/fire/storage';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()), // 👈 ¡Aquí agregamos Storage!
-    provideAnimations() // ✅ Habilitar animaciones
+    provideAnimations(), provideAnimationsAsync('noop') // ✅ Habilitar animaciones
   ]
 };
