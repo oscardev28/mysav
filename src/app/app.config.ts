@@ -18,7 +18,8 @@ export const appConfig: ApplicationConfig = {
     provideAnalytics(() => getAnalytics()),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
-    provideStorage(() => getStorage()), // 👈 ¡Aquí agregamos Storage!
-    provideAnimations(), provideAnimationsAsync('noop') // ✅ Habilitar animaciones
+    provideStorage(() => getStorage()),
+    provideAnimations() // ✅ solo esta línea para Material
   ]
 };
+
