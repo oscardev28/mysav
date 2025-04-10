@@ -8,8 +8,6 @@ import { UserModel } from '../models/user.model';
 import { ImageCropperComponent } from 'ngx-image-cropper';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { LoaderService } from '../services/loader.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ModalDialogComponent } from '../modal/modal.component';
 
 interface Error {
   state: boolean,
@@ -53,7 +51,6 @@ export class ProfileComponent {
     private userService: UserService,
     private auth: Auth,
     private loader: LoaderService,
-    private dialog: MatDialog
   ) {
     this.passForm = this.fb.group({
       lastPassword: ['', [Validators.required]],
@@ -77,14 +74,8 @@ export class ProfileComponent {
     this.previewUrl = user?.photoURL || 'assets/img/usuario.webp';
   }
 
-  openModal(title: string, message: string = '', showActions: boolean = false) {
-    const dialogRef = this.dialog.open(ModalDialogComponent, {
-      data: {
-        title: title,
-        message: message,
-        showActions: showActions
-      }
-    });
+  openModal(title: string, message: string = '') {
+    alert(`${title}\n${message}`);
   }
 
   async changePassword() {

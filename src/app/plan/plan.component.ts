@@ -8,8 +8,6 @@ import { Router } from '@angular/router';
 import { BackBtnComponent } from '../buttons/back-btn/back-btn.component';
 import { NextBtnComponent } from '../buttons/next-btn/next-btn.component';
 import { GastoModel } from '../models/expense.model';
-import { MatDialog } from '@angular/material/dialog';
-import { ModalDialogComponent } from '../modal/modal.component';
 import { firstValueFrom } from 'rxjs';
 import { LoaderService } from '../services/loader.service';
 
@@ -47,7 +45,6 @@ export class PlanComponent implements OnInit {
     private planService: PlanService,
     private router: Router,
     public helper: Helper,
-    private dialog: MatDialog,
     private loader: LoaderService
   ) {
     this.planForm = this.fb.group({
@@ -61,16 +58,6 @@ export class PlanComponent implements OnInit {
 
   ngOnInit() {
     this.obtenerPlan();
-  }
-
-  openModal(title: string, message: string, showActions: boolean = false) {
-    const dialogRef = this.dialog.open(ModalDialogComponent, {
-      data: {
-        title: title,
-        message: message,
-        showActions: showActions
-      }
-    });
   }
 
   async obtenerPlan() {
@@ -161,17 +148,9 @@ export class PlanComponent implements OnInit {
     }
 
     // Si ya está guardado en Firebase, mostrar confirmación y eliminar
-    const dialogRef = this.dialog.open(ModalDialogComponent, {
-      data: {
-        title: '¿Eliminar gasto?',
-        message: '¿Seguro que quieres eliminar este gasto?',
-        showActions: true
-      }
-    });
+    const confirmed = confirm('¿Eliminar gasto?\n¿Seguro que quieres eliminar este gasto?');
 
-    const result = await firstValueFrom(dialogRef.afterClosed());
-
-    if (result) {
+    if (confirmed) {
       try {
         this.loader.show();
         await this.planService.eliminarGasto(gasto, tipo);
@@ -181,6 +160,11 @@ export class PlanComponent implements OnInit {
       }
       this.loader.hide();
     }
+
+  }
+
+  openModal(title: string, message: string) {
+    alert(`${title}\n${message}`);
   }
 
   async guardarPlan(btn: HTMLButtonElement) {
