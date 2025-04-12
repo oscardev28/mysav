@@ -10,28 +10,6 @@
         class="w-36 h-36 rounded-full border-2 border-gray-300 object-cover">
     </div>
 
-    <!-- Cropper (solo si hay imagen seleccionada) -->
-    <image-cropper
-      *ngIf="imageChangedEvent"
-      [imageChangedEvent]="imageChangedEvent"
-      [maintainAspectRatio]="true"
-      [aspectRatio]="1"
-      [resizeToWidth]="300"
-      format="png"
-      [transform]="transform"
-      [imageQuality]="100"
-      [autoCrop]="true"
-      [roundCropper]="false"
-      (imageCropped)="imageCropped($event)">
-    </image-cropper>
-
-
-    <!-- Botones de control de imagen -->
-    <div class="flex gap-4 mt-2 mb-6" *ngIf="imageChangedEvent">
-      <button type="button" class="btn btn-sm" (click)="confirmCrop()">Confirmar</button>
-      <button type="button" class="btn btn-sm" (click)="cancelCrop()">Cancelar</button>
-    </div>
-
     <!-- Botón para subir foto -->
     <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
     <button type="button" class="btn text-sm mb-6" (click)="openFileInput()">Subir Foto</button>

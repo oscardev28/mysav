@@ -5,8 +5,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Auth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from '@angular/fire/auth';
 import { UserModel } from '../models/user.model';
-import { ImageCropperComponent } from 'ngx-image-cropper';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { LoaderService } from '../services/loader.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalDialogComponent } from '../modal/modal.component';
@@ -18,7 +16,7 @@ interface Error {
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, CommonModule, ImageCropperComponent],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -150,100 +148,33 @@ export class ProfileComponent {
     }
   }
 
-  transform = {
-    scale: 1,
-    rotate: 0,
-    flipH: false,
-    flipV: false
-  };
-
-  zoomIn() {
-    this.transform = {
-      ...this.transform,
-      scale: this.transform.scale + 0.1
-    };
-  }
-
-  zoomOut() {
-    this.transform = {
-      ...this.transform,
-      scale: this.transform.scale - 0.1
-    };
-  }
-
-  rotateLeft() {
-    this.transform = {
-      ...this.transform,
-      rotate: this.transform.rotate - 90
-    };
-  }
-
-  rotateRight() {
-    this.transform = {
-      ...this.transform,
-      rotate: this.transform.rotate + 90
-    };
-  }
-
   openFileInput() {
     document.getElementById('fileInput')?.click();
   }
 
   onFileSelected(event: any) {
-    this.imageChangedEvent = event;
-  }
-
-  imageCropped(event: ImageCroppedEvent) {
-    if (event.blob) {
-      this.selectedFile = new File([event.blob], 'profile.png', { type: event.blob.type });
-      this.previewUrl = URL.createObjectURL(event.blob); // Vista previa rápida
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
-  }
-
-  confirmCrop() {
-    if (!this.selectedFile) {
-      console.warn('No hay imagen recortada para confirmar');
-      return;
-    }
-    this.imageChangedEvent = ''; // Oculta el cropper
-  }
-
-  cancelCrop() {
-    this.imageChangedEvent = '';
-    this.selectedFile = null;
-    this.previewUrl = this.profileForm.value.photoURL || 'assets/img/usuario.webp';
-  }
-
-  base64ToFile(base64: string, filename: string): File {
-    const arr = base64.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
   }
 
   async onSubmit() {
-    this.loader.show();
     try {
       const userData = this.profileForm.value as Partial<UserModel>;
-
-      const finalImage = this.croppedImage
-        ? this.base64ToFile(this.croppedImage, 'profile.png')
-        : this.selectedFile;
-
-      await this.userService.updateUserProfile(userData, finalImage);
-      this.openModal("✅ Perfil actualizado correctamente");
+      await this.userService.updateUserProfile(userData, this.selectedFile);
+      alert("✅ Perfil actualizado correctamente");
     } catch (error: any) {
       this.error = {
         state: true,
         text: error.message || 'Ocurrió un error al actualizar el perfil'
       };
     }
-    this.loader.hide();
   }
 
 }
