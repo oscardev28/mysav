@@ -8,6 +8,8 @@ import { UserModel } from '../models/user.model';
 import { LoaderService } from '../services/loader.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalDialogComponent } from '../modal/modal.component';
+import { CropperModalComponent } from '../cropper-modal/cropper-modal.component';
+import { ChangeDetectorRef } from '@angular/core';
 
 interface Error {
   state: boolean,
@@ -51,7 +53,8 @@ export class ProfileComponent {
     private userService: UserService,
     private auth: Auth,
     private loader: LoaderService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {
     this.passForm = this.fb.group({
       lastPassword: ['', [Validators.required]],
@@ -155,10 +158,21 @@ export class ProfileComponent {
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
       const reader = new FileReader();
       reader.onload = () => {
-        this.previewUrl = reader.result as string;
+        this.dialog.open(CropperModalComponent, {
+          data: { imageUrl: reader.result as string }
+        }).afterClosed().subscribe((editedFile: File) => {
+          if (editedFile) {
+            this.selectedFile = editedFile;
+            const previewReader = new FileReader();
+            previewReader.onload = () => {
+              this.previewUrl = previewReader.result as string;
+              this.cdr.detectChanges(); // 👈 Forzamos la detección de cambios
+            };
+            previewReader.readAsDataURL(editedFile);
+          }
+        });
       };
       reader.readAsDataURL(file);
     }
