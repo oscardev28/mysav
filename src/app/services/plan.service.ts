@@ -16,27 +16,42 @@ export class PlanService {
     return `${año}-${mes}`; // Formato "YYYY-MM"
   }
 
-  async guardarPlan(ingresos: number, ahorro: number, gastos: GastoModel[], gastosVariables: GastoModel[]) {
+  // 2) guardarPlan: lees el plan existente, concatenas + haces un solo setDoc
+  async guardarPlan(
+    ingresos: number,
+    ahorro: number,
+    nuevosGastos: GastoModel[],
+    nuevosGastosVariables: GastoModel[]
+  ) {
     const user = this.auth.currentUser;
     if (!user) throw new Error("Usuario no autenticado");
 
     const fechaActual = this.obtenerMesActual();
-    const planRef = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
+    const planRef     = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
 
-    const planData = {
-      ingresos,
-      ahorro,
-      gastos,
-      gastosVariables
-    };
+    // 1) Cargo los arrays existentes (o vacío)
+    const snap = await getDoc(planRef);
+    const existente = snap.exists() ? (snap.data() as any) : {};
+    const oldGastos = existente.gastos          || [];
+    const oldVars   = existente.gastosVariables || [];
 
+    // 2) Concateno
+    const mergedGastos = [
+      ...oldGastos,
+      ...nuevosGastos.map(g => ({ ...g, id: g.id ?? crypto.randomUUID() }))
+    ];
+    const mergedVars = [
+      ...oldVars,
+      ...nuevosGastosVariables.map(g => ({ ...g, id: g.id ?? crypto.randomUUID() }))
+    ];
+
+    // 3) setDoc con merge:true para no sobreescribir otros campos
     await setDoc(planRef, {
       ingresos,
       ahorro,
-      gastos: gastos.map(g => ({ ...g })), // convierte a objeto plano
-      gastosVariables: gastosVariables.map(g => ({ ...g }))
+      gastos: mergedGastos,
+      gastosVariables: mergedVars
     }, { merge: true });
-
   }
 
   async obtenerPlanActual(): Promise<{ ingresos: number; ahorro: number; gastos: GastoModel[]; gastosVariables: GastoModel[] } | null> {
@@ -96,20 +111,29 @@ export class PlanService {
     return `${año}-${mes}`;
   }
 
-  async añadirGasto(nuevosGastos: GastoModel[], tipo: 'fijo' | 'variable' = 'variable') {
+  // 1) añadirGasto: un único updateDoc con todos los elementos
+  async añadirGasto(
+    nuevosGastos: GastoModel[],
+    tipo: 'fijo' | 'variable' = 'variable'
+  ) {
     const user = this.auth.currentUser;
     if (!user) throw new Error("Usuario no autenticado");
 
     const fechaActual = this.obtenerMesActual();
-    const planRef = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
+    const planRef    = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
 
-    const gastosConID = nuevosGastos.map(gasto => ({ ...gasto, id: crypto.randomUUID() }));
+    if (nuevosGastos.length === 0) return;
 
-    for (const gasto of gastosConID) {
-      await updateDoc(planRef, {
-        [tipo === 'fijo' ? 'gastos' : 'gastosVariables']: arrayUnion(gasto)
-      });
-    }
+    // Genera un ID si no lo llevan y pásalos todos de golpe
+    const paraUnion = nuevosGastos.map(g => ({
+      ...g,
+      id: g.id ?? crypto.randomUUID()
+    }));
+
+    await updateDoc(planRef, {
+      [tipo === 'fijo' ? 'gastos' : 'gastosVariables']:
+        arrayUnion(...paraUnion)
+    });
   }
 
   async eliminarGasto(gasto: GastoModel, tipo: 'fijo' | 'variable') {

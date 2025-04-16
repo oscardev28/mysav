@@ -67,6 +67,7 @@ export class PlanComponent implements OnInit {
     "Ropa y calzado",
     "Averías y reparaciones",
     "Viajes y escapadas",
+    "Supermercado",
     "Imprevistos",
     "Otros"
   ];
