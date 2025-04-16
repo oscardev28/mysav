@@ -33,13 +33,42 @@ export class PlanComponent implements OnInit {
   newGastos: GastoModel[] = [];
   newGastosVariables: GastoModel[] = [];
 
+  // Categorías de gastos fijos
   tiposDeGasto: string[] = [
-    "Alquiler/Hipoteca", "Supermercado", "Internet", "Teléfono", "Gasolina", "Coche", "Suscripciones", "Seguro", "Luz", "Agua", "Gimnasio",
-    "Transporte público", "Vacaciones"
+    "Agua",
+    "Alquiler/Hipoteca",
+    "Colegiaturas",
+    "Condominio",
+    "Electricidad",
+    "Gas",
+    "Gasolina",
+    "Impuestos (IBI)",
+    "Internet",
+    "Mantenimiento del hogar",
+    "Pagos de coche",
+    "Préstamos y deudas",
+    "Seguros (auto, hogar, salud, vida)",
+    "Teléfono fijo",
+    "Transporte público",
+    "Gimnasio",
+    "Streaming y suscripciones",
+    "Otros"
   ];
 
+  // Categorías de gastos variables
   tiposDeGastoVariable: string[] = [
-    "Comer fuera", "Compras", "Ocio", "Salud", "Transporte", "Tecnología", "Viajes"
+    "Consultas médicas",
+    "Delivery y comida rápida",
+    "Estética y peluquería",
+    "Gimnasio",
+    "Medicinas y farmacia",
+    "Ocio y entretenimiento",
+    "Productos de higiene",
+    "Ropa y calzado",
+    "Averías y reparaciones",
+    "Viajes y escapadas",
+    "Imprevistos",
+    "Otros"
   ];
 
   constructor(
