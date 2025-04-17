@@ -37,10 +37,10 @@
         <span class="flex items-center"><div class="w-4 h-4 my-1 bg-red-500 mr-2"></div>{{ porcentajeAhorro | number:'1.0-0' }}% Ahorro</span>
       </div>
       <div class="w-full flex flex-col text-sm font-bold text-white">
-        <span>Ingresos: {{ ingresos }} €</span>
-        <span>Ahorro: {{ ahorro }} €</span>
-        <span>Dinero gastado: {{ totalGasto }} €</span>
-        <span>Dinero restante: {{ remainingMoney }} €</span>
+        <span>Ingresos: {{ ingresos.toFixed(2) }} €</span>
+        <span>Ahorro: {{ ahorro.toFixed(2) }} €</span>
+        <span>Dinero gastado: {{ totalGasto.toFixed(2) }} €</span>
+        <span>Dinero restante: {{ remainingMoney.toFixed(2) }} €</span>
       </div>
     </div>
   </article>
@@ -49,39 +49,48 @@
     <button (click)="changeView('table')" class="btn font-bold text-xs">Tabla</button>
     <button (click)="changeView('grafico')" class="btn font-bold text-xs">Gráfico</button>
     <button (click)="changeView('estadisticas')" class="btn font-bold text-xs">Estadísticas</button>
+    <button class="bg-gradient text-white rounded-full p-2 font-bold px-auto"><i class="text-2xl ri-add-circle-fill"></i></button>
   </article>
 
-  <article *ngIf="plan && view == 'table'" id="records" class="my-5 w-full">
-    <div class="rounded-lg bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 overflow-auto max-h-96">
-      <table class="text-sm w-full border border-gray-300 border-separate border-spacing-0 bg-white text-black rounded-lg overflow-hidden">
-        <thead>
-          <tr class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-white">
-            <th class="border border-gray-300 px-1 py-2">Fecha</th>
-            <th class="border border-gray-300 px-1 py-2">Nombre</th>
-            <th class="border border-gray-300 px-1 py-2">€</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="bg-blue-500">
-            <td class="border border-gray-300 px-1 py-2 font-bold text-white text-center" colspan="3">FIJOS</td>
-          </tr>
-          <tr *ngFor="let gasto of plan.gastos" class="border border-gray-300">
-            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
-          </tr>
+  <article *ngIf="plan && view === 'table'" id="records" class="my-5 w-full">
+    <div class="rounded-lg overflow-hidden relative">
+      <div #scrollContainer class="overflow-auto max-h-96 relative" (scroll)="onScroll()">
+        <table class="text-sm w-full border border-gray-300 border-separate border-spacing-0 bg-white text-black">
+          <thead class="sticky top-0 z-20 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-white">
+            <tr>
+              <th class="border border-gray-300 px-1 py-2">Fecha</th>
+              <th class="border border-gray-300 px-1 py-2">Nombre</th>
+              <th class="border border-gray-300 px-1 py-2">€</th>
+            </tr>
+            <tr *ngIf="stickySection" class="bg-blue-500 z-10" [ngClass]="{
+              'bg-blue-500': stickySection === 'fijos',
+              'bg-green-500': stickySection === 'variables'}">
+              <td colspan="3" class="border border-gray-300 px-1 py-2 font-bold text-white text-center">{{ stickySection === 'fijos' ? 'FIJOS' : 'VARIABLES' }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- FIJOS -->
+            <tr #fijosRow class="bg-blue-500 z-10">
+              <td colspan="3" class="border border-gray-300 px-1 py-2 font-bold text-white text-center">FIJOS</td>
+            </tr>
+            <tr *ngFor="let gasto of plan.gastos">
+              <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
+              <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
+              <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
+            </tr>
 
-          <tr class="bg-green-500">
-            <td class="border border-gray-300 px-1 py-2 font-bold text-white text-center" colspan="3">VARIABLES</td>
-          </tr>
-
-          <tr *ngFor="let gasto of plan.gastosVariables" class="border border-gray-300">
-            <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
-            <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
-          </tr>
-        </tbody>
-      </table>
+            <!-- VARIABLES -->
+            <tr #variablesRow class="bg-green-500 z-10">
+              <td colspan="3" class="border border-gray-300 px-1 py-2 font-bold text-white text-center">VARIABLES</td>
+            </tr>
+            <tr *ngFor="let gasto of plan.gastosVariables">
+              <td class="border border-gray-300 px-1 py-2">{{ helper.formatearFecha(gasto.date) }}</td>
+              <td class="border border-gray-300 px-1 py-2">{{ gasto.name }}</td>
+              <td class="border border-gray-300 px-1 py-2">{{ gasto.value }}€</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </article>
 

@@ -1,3 +1,9 @@
 table td {
   text-align: center;
 }
+
+.sticky-header {
+  position: sticky;
+  top: 42px; /* justo debajo del thead */
+  z-index: 15;
+}

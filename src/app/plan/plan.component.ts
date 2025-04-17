@@ -52,6 +52,7 @@ export class PlanComponent implements OnInit {
     "Transporte público",
     "Gimnasio",
     "Streaming y suscripciones",
+    "Inversión",
     "Otros"
   ];
 
@@ -59,6 +60,7 @@ export class PlanComponent implements OnInit {
   tiposDeGastoVariable: string[] = [
     "Consultas médicas",
     "Delivery y comida rápida",
+    "Inversión",
     "Estética y peluquería",
     "Gimnasio",
     "Medicinas y farmacia",

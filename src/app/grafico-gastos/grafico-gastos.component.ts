@@ -22,11 +22,11 @@ export class GraficoGastosComponent implements OnInit {
 
     const gastos = this.plan.gastos.concat(this.plan.gastosVariables);
 
-    console.log(gastos)
+    console.log('GASTOS', gastos)
 
     gastos.forEach((gasto: any) => {
-      const fecha = new Date(gasto.fecha).getDate(); // Obtener día del mes
-      gastosPorDia[fecha] = gasto.valor;
+      const fecha = new Date(gasto.date).getDate(); // Obtener día del mes
+      gastosPorDia[fecha] = gasto.value;
     });
 
     // Crear etiquetas y valores para la gráfica

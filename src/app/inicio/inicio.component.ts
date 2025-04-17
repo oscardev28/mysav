@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular/core';
 import { PlanService } from '../services/plan.service';
 import { CommonModule } from '@angular/common';
 import { GraficoGastosComponent } from '../grafico-gastos/grafico-gastos.component';
@@ -61,6 +61,49 @@ export class InicioComponent implements OnInit {
       this.title = `${this.helper.getMonthName().toUpperCase()} -  ${this.helper.getYear()}`
     } catch (error) {
       console.error("Error al obtener plan:", error);
+    }
+  }
+
+  stickySection: 'fijos' | 'variables' | null = null;
+
+  @ViewChild('fijosRow') fijosRow!: ElementRef;
+  @ViewChild('variablesRow') variablesRow!: ElementRef;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      if (this.scrollContainer && this.fijosRow && this.variablesRow) {
+        this.scrollContainer.nativeElement.addEventListener('scroll', () => this.onScroll());
+        this.onScroll(); // inicializa estado al renderizar
+      }
+    }, 0);
+  }
+
+  onScroll() {
+    if (!this.fijosRow?.nativeElement || !this.variablesRow?.nativeElement || !this.scrollContainer?.nativeElement) {
+      return;
+    }
+
+    const fijosTop = this.fijosRow.nativeElement.getBoundingClientRect().top;
+    const variablesTop = this.variablesRow.nativeElement.getBoundingClientRect().top;
+    const containerTop = this.scrollContainer.nativeElement.getBoundingClientRect().top;
+
+    if (variablesTop <= containerTop + 42) {
+      this.stickySection = 'variables';
+    } else if (fijosTop <= containerTop + 42) {
+      this.stickySection = 'fijos';
+    } else {
+      this.stickySection = null;
+    }
+
+    if (!this.scrollContainer?.nativeElement) return;
+
+    const scrollEl = this.scrollContainer.nativeElement;
+
+    const isAtTop = scrollEl.scrollTop === 0;
+
+    if (isAtTop) {
+      this.stickySection = null;
     }
   }
 
