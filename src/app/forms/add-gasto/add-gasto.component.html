@@ -1,0 +1,44 @@
+<!-- Añadir Gastos -->
+<form [formGroup]="addGastoForm" class="[&>input]:w-full [&>div]:w-full w-full flex flex-col items-center">
+  <div class="my-1 flex flex-col gap-y-1">
+    <label for="nombre">Nombre del Gasto</label>
+    <input formControlName="nombre" id="nombre" type="text" placeholder="Nombre" class="border text-black p-2 mb-2 w-full outline-none">
+    <span *ngIf="addGastoForm.controls['nombre'].invalid && addGastoForm.controls['nombre'].touched"
+      class="text-red-500">Tienes que rellenar este campo</span>
+  </div>
+
+  <div class="my-1 flex flex-col gap-y-1">
+    <label for="tipo">Tipo</label>
+    <select (click)="selectType()" formControlName="tipo" id="tipo" class="border text-black p-2 mb-2 w-full outline-none">
+      <option selected value="variable">
+        Variable
+      </option>
+      <option value="fijo">
+        Fijo
+      </option>
+    </select>
+    <span *ngIf="addGastoForm.controls['tipo'].invalid && addGastoForm.controls['tipo'].touched"
+      class="text-red-500">Tienes que rellenar este campo</span>
+  </div>
+
+  <div class="my-1 flex flex-col gap-y-1">
+    <label for="category">Categoría</label>
+    <select formControlName="category" id="category" class="border text-black p-2 mb-2 w-full outline-none">
+      <option *ngFor="let item of categories; let i = index" [selected]="i === 0" [value]="item">
+        {{ item }}
+      </option>
+    </select>
+    <span *ngIf="addGastoForm.controls['category'].invalid && addGastoForm.controls['category'].touched"
+      class="text-red-500">Tienes que rellenar este campo</span>
+  </div>
+
+  <div class="my-1 flex flex-col gap-y-1">
+    <label for="valor">Valor</label>
+    <input formControlName="valor" id="valor" type="number" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
+    <span *ngIf="addGastoForm.controls['valor'].invalid && addGastoForm.controls['valor'].touched"
+      class="text-red-500">Tienes que rellenar este campo</span>
+  </div>
+
+  <button type="button" #btn (click)="addGasto(btn)" class="btn mt-3 text-xs">Añadir</button>
+
+</form>

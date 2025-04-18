@@ -136,6 +136,26 @@ export class PlanService {
     });
   }
 
+  async addSingleGasto(gasto: GastoModel) {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Usuario no autenticado");
+
+    const fechaActual = this.obtenerMesActual();
+    const planRef = doc(this.firestore, `users/${user.uid}/planes/${fechaActual}`);
+
+    if (!gasto) return;
+
+    const gastoConID = {
+      ...gasto,
+      id: gasto.id ?? crypto.randomUUID()
+    };
+
+    await updateDoc(planRef, {
+      [gasto.type === 'fijo' ? 'gastos' : 'gastosVariables']: arrayUnion(gastoConID)
+    });
+  }
+
+
   async eliminarGasto(gasto: GastoModel, tipo: 'fijo' | 'variable') {
     const user = this.auth.currentUser;
     if (!user) throw new Error("Usuario no autenticado");

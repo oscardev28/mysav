@@ -1,3 +1,4 @@
+import { ModalService } from './../services/modal.service';
 import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular/core';
 import { PlanService } from '../services/plan.service';
 import { CommonModule } from '@angular/common';
@@ -7,7 +8,6 @@ import { EstadisticasComponent } from '../estadisticas/estadisticas.component';
 import { Helper } from '../services/helper.service';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate, state } from '@angular/animations';
-
 
 @Component({
   selector: 'app-inicio',
@@ -33,6 +33,7 @@ import { trigger, transition, style, animate, state } from '@angular/animations'
 
 })
 export class InicioComponent implements OnInit {
+  modalVisible: boolean = false;
   ingresos: number = 0;
   ahorro: number = 0;
   fijos: number = 0;
@@ -51,7 +52,7 @@ export class InicioComponent implements OnInit {
   animating = false;
   animationDirection: 'next' | 'prev' = 'next'; // Dirección de la animación
 
-  constructor(private planService: PlanService, private gastosService: GastosService, public helper: Helper, public router: Router) {}
+  constructor(private modalService: ModalService, private planService: PlanService, private gastosService: GastosService, public helper: Helper, public router: Router) {}
 
   async ngOnInit() {
     try {
@@ -105,6 +106,10 @@ export class InicioComponent implements OnInit {
     if (isAtTop) {
       this.stickySection = null;
     }
+  }
+
+  showModal() {
+    this.modalService.openModal();
   }
 
   async changeMonth(next: boolean) {

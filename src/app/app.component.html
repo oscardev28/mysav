@@ -2,5 +2,6 @@
   <app-header [title]="title"></app-header>
 
   <app-loader />
+  <app-modal-primary *ngIf="modalVisible" (closeModal)="closeModal()"></app-modal-primary>
   <router-outlet></router-outlet>
 </div>

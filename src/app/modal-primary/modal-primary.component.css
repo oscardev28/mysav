@@ -1,0 +1,23 @@
+/* Fondo del modal (oscuro detrás del modal) */
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Modal de fondo blanco */
+.bg-white {
+  background-color: white;
+}
+
+/* Sombra para dar efecto de profundidad */
+.shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Fondo oscuro con transparencia */
+.bg-opacity-75 {
+  background-color: rgba(0, 0, 0, 0.75);
+}
