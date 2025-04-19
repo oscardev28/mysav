@@ -1,7 +1,7 @@
 import { GastoModel } from './../../models/expense.model';
 import { PlanService } from './../../services/plan.service';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -61,6 +61,7 @@ export class AddGastoComponent {
 
   categories: string[] = [];
   addGastoForm: FormGroup;
+  @Output() gastoAñadido = new EventEmitter<void>();
 
   constructor(
     private planService: PlanService,
@@ -121,7 +122,7 @@ export class AddGastoComponent {
         this.loader.show();
         await this.planService.addSingleGasto(gasto);
         this.openModal('Gasto añadido');
-        this.router.navigate(['/inicio']);
+        this.gastoAñadido.emit(); // ✅ Notifica al padre
       } catch (error) {
         this.openModal('Error al guardar, intentalo de nuevo más tarde');
         console.error("Error al guardar los gastos adicionales:", error);

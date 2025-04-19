@@ -11,11 +11,18 @@ import { AddGastoComponent } from '../forms/add-gasto/add-gasto.component';
 export class ModalPrimaryComponent {
   // EventEmitter para cerrar el modal desde el componente padre
   @Output() closeModal = new EventEmitter<void>();
+  @Output() gastoAñadido = new EventEmitter<void>();
+
   isVisible: boolean = false;
 
   // Método para abrir el modal
   open() {
     this.isVisible = true;
+  }
+
+  handleGasto() {
+    this.gastoAñadido.emit(); // 🔁 Vuelve a emitir al componente padre
+    this.close(); // También cerramos el modal
   }
 
   // Método para cerrar el modal

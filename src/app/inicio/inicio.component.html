@@ -49,8 +49,10 @@
     <button (click)="changeView('table')" class="btn font-bold text-xs">Tabla</button>
     <button (click)="changeView('grafico')" class="btn font-bold text-xs">Gráfico</button>
     <button (click)="changeView('estadisticas')" class="btn font-bold text-xs">Estadísticas</button>
-    <button (click)="showModal()" class="bg-gradient text-white rounded-full p-2 font-bold"><i class="text-2xl ri-add-circle-fill"></i></button>
+    <button (click)="showModal()" class="btn font-bold text-xs">Añadir gasto</button>
   </article>
+
+  <app-modal-primary (gastoAñadido)="addGasto()" *ngIf="modalVisible" (closeModal)="closeModal()"></app-modal-primary>
 
   <article *ngIf="plan && view === 'table'" id="records" class="my-5 w-full">
     <div class="rounded-lg overflow-hidden relative">

@@ -5,7 +5,7 @@
       <button (click)="close()" class="text-black text-2xl font-bold">&times;</button>
     </div>
     <div class="mt-4">
-      <app-add-gasto></app-add-gasto>
+      <app-add-gasto (gastoAñadido)="handleGasto()"></app-add-gasto>
     </div>
 
   </div>

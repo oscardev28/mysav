@@ -8,10 +8,11 @@ import { EstadisticasComponent } from '../estadisticas/estadisticas.component';
 import { Helper } from '../services/helper.service';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate, state } from '@angular/animations';
+import { ModalPrimaryComponent } from '../modal-primary/modal-primary.component';
 
 @Component({
   selector: 'app-inicio',
-  imports: [CommonModule, GraficoGastosComponent, EstadisticasComponent],
+  imports: [CommonModule, GraficoGastosComponent, EstadisticasComponent, ModalPrimaryComponent],
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.css',
   animations: [
@@ -59,6 +60,9 @@ export class InicioComponent implements OnInit {
       //this.generarDatos()
       await this.cargarPlan();
       this.getRemainingMoney();
+      this.modalService.modalVisibility$.subscribe((isVisible) => {
+        this.modalVisible = isVisible;
+      });
       this.title = `${this.helper.getMonthName().toUpperCase()} -  ${this.helper.getYear()}`
     } catch (error) {
       console.error("Error al obtener plan:", error);
@@ -78,6 +82,15 @@ export class InicioComponent implements OnInit {
         this.onScroll(); // inicializa estado al renderizar
       }
     }, 0);
+  }
+
+  async addGasto() {
+    await this.cargarPlan();
+    this.getRemainingMoney();
+  }
+
+  closeModal() {
+    this.modalService.closeModal(); // Llamamos al servicio para cerrar el modal
   }
 
   onScroll() {
