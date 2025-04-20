@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ModalDialogComponent } from '../modal/modal.component';
 import { CropperModalComponent } from '../cropper-modal/cropper-modal.component';
 import { ChangeDetectorRef } from '@angular/core';
+import { NgxPhotoEditorModule, NgxCroppedEvent, NgxPhotoEditorService } from 'ngx-photo-editor';
 
 interface Error {
   state: boolean,
@@ -18,7 +19,7 @@ interface Error {
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NgxPhotoEditorModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -48,7 +49,10 @@ export class ProfileComponent {
   imageChangedEvent: any = '';
   croppedImage: string = '';
 
+  output?: NgxCroppedEvent;
+
   constructor(
+    private photoEditor: NgxPhotoEditorService,
     private fb: FormBuilder,
     private userService: UserService,
     private auth: Auth,
@@ -77,6 +81,9 @@ export class ProfileComponent {
 
     this.previewUrl = user?.photoURL || 'assets/img/usuario.webp';
   }
+
+
+
 
   openModal(title: string, message: string = '', showActions: boolean = false) {
     const dialogRef = this.dialog.open(ModalDialogComponent, {
@@ -156,33 +163,37 @@ export class ProfileComponent {
   }
 
   onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.dialog.open(CropperModalComponent, {
-          data: { imageUrl: reader.result as string }
-        }).afterClosed().subscribe((editedFile: File) => {
-          if (editedFile) {
-            this.selectedFile = editedFile;
-            const previewReader = new FileReader();
-            previewReader.onload = () => {
-              this.previewUrl = previewReader.result as string;
-              this.cdr.detectChanges(); // 👈 Forzamos la detección de cambios
-            };
-            previewReader.readAsDataURL(editedFile);
-          }
-        });
-      };
-      reader.readAsDataURL(file);
+    this.photoEditor.open(event, {
+      aspectRatio: 1,
+      autoCropArea: 1,
+      viewMode: 1,
+    }).subscribe((data: NgxCroppedEvent) => {
+      this.output = data;
+      // Actualizar la imagen previa
+      if (data.base64) {
+        this.previewUrl = data.base64;
+        this.selectedFile = this.base64ToFile(data.base64, 'profile.png');
+      }
+    });
+  }
+
+  base64ToFile(base64: string, filename: string): File {
+    const arr = base64.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
     }
+    return new File([u8arr], filename, { type: mime });
   }
 
   async onSubmit() {
     try {
       const userData = this.profileForm.value as Partial<UserModel>;
       await this.userService.updateUserProfile(userData, this.selectedFile);
-      alert("✅ Perfil actualizado correctamente");
+      this.openModal('Perfil actualizado con éxito.');
     } catch (error: any) {
       this.error = {
         state: true,

@@ -3,16 +3,14 @@
   <h2 class="text-2xl font-bold mb-4 text-white">Mi perfil</h2>
 
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="[&>div>label]:text-white my-4 flex flex-col items-center">
-    <!-- Previsualización de la imagen -->
+    <!-- Previsualización -->
     <div class="relative mb-4">
-      <img [src]="previewUrl || profileForm.value.photoURL || 'assets/img/usuario.webp'"
-        alt="Foto de perfil"
-        class="w-36 h-36 rounded-full border-2 border-gray-300 object-cover">
+      <img [src]="previewUrl || 'assets/img/usuario.webp'" class="w-36 h-36 rounded-full border-2 object-cover" />
     </div>
 
-    <!-- Botón para subir foto -->
-    <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
-    <button type="button" class="btn text-sm mb-6" (click)="openFileInput()">Subir Foto</button>
+    <!-- Subir archivo -->
+    <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden />
+    <button class="btn" type="button" (click)="openFileInput()">Subir foto</button>
 
     <!-- Formulario de datos -->
     <div class="flex flex-col mb-3">
