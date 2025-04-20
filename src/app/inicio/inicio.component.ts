@@ -161,6 +161,8 @@ export class InicioComponent implements OnInit {
     if (!this.plan) {
       this.router.navigate(['/plan']);
     } else {
+      this.plan.gastos = this.helper.sortDate(this.plan.gastos)
+      this.plan.gastosVariables = this.helper.sortDate(this.plan.gastosVariables)
       console.log(`Plan actualizado para ${this.currentMonth + 1}/${this.currentYear}`, this.plan);
       this.getGastos()
     }

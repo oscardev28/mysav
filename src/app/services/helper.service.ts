@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GastoModel } from '../models/expense.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,14 @@ export class Helper {
     };
 
     return new Intl.DateTimeFormat('es-ES', opciones).format(fecha);
+  }
+
+  sortDate(arr: GastoModel[]){
+    return arr.sort((a, b) => {
+      const fechaA = new Date(a.date);
+      const fechaB = new Date(b.date);
+      return fechaB.getTime() - fechaA.getTime(); // 🔽 más reciente primero
+    });
   }
 
   getMonthName(month:number = 12) {
