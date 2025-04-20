@@ -46,7 +46,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "node_modules/ngx-photo-editor/photo-editor.css",
+              "src/styles/vendor/photo-editor.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -109,7 +109,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "node_modules/ngx-photo-editor/photo-editor.css",
+              "src/styles/vendor/photo-editor.css",
               "src/styles.css"
             ],
             "scripts": []
