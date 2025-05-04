@@ -108,6 +108,13 @@
     </div>
 
     <div class="my-1 flex flex-col gap-y-1">
+      <label for="date">Fecha</label>
+      <input formControlName="date" id="date" type="datetime-local" placeholder="date" class="border text-black p-2 mb-2 w-full outline-none">
+      <span *ngIf="planForm.controls['date'].invalid && planForm.controls['date'].touched"
+        class="text-red-500">Tienes que rellenar este campo</span>
+    </div>
+
+    <div class="my-1 flex flex-col gap-y-1">
       <label for="valor">Valor</label>
       <input formControlName="valor" id="valor" type="number" placeholder="Valor" class="border text-black p-2 mb-2 w-full outline-none">
       <span *ngIf="planForm.controls['valor'].invalid && planForm.controls['valor'].touched"

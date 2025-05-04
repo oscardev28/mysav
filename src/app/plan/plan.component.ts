@@ -87,7 +87,8 @@ export class PlanComponent implements OnInit {
       ahorro: ['', [Validators.required, Validators.min(0)]],
       nombre: ['', Validators.required],
       tipo: ['', Validators.required],
-      valor: ['', Validators.required]
+      valor: ['', Validators.required],
+      date: ['', Validators.required]
     });
   }
 
@@ -115,6 +116,7 @@ export class PlanComponent implements OnInit {
         this.ahorro = plan.ahorro;
         this.planForm.controls['ingresos'].setValue(this.ingresos);
         this.planForm.controls['ahorro'].setValue(this.ahorro);
+        this.planForm.controls['date'].setValue(this.helper.toInputDatetimeFormat(this.helper.getDate()));
         this.gastos = plan.gastos;
         this.gastosVariables = plan.gastosVariables;
         this.step = 3;
@@ -171,8 +173,10 @@ export class PlanComponent implements OnInit {
       this.planForm.value.tipo,
       'variable',
       this.planForm.value.valor,
-      this.helper.getDate()
+      (this.planForm.value.date) ? this.helper.fromInputDatetimeFormat(this.planForm.value.date) : this.helper.getDate()
     );
+
+    console.log('Nuevo gasto variable:', nuevoGasto);
     this.gastosVariables.push(nuevoGasto);
     this.newGastosVariables.push(nuevoGasto);
     this.planForm.reset();

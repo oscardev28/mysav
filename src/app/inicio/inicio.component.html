@@ -30,26 +30,57 @@
     </div>
 
     <!-- Porcentajes debajo -->
-    <div class="w-full flex justify-between mt-3">
-      <div class="w-full ml-auto flex flex-col text-sm font-bold text-white">
-        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-blue-500 mr-2"></div>{{ porcentajeFijos | number:'1.0-0' }}% Fijos</span>
-        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-green-500 mr-2"></div>{{ porcentajeVariables | number:'1.0-0' }}% Variables</span>
-        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-red-500 mr-2"></div>{{ porcentajeAhorro | number:'1.0-0' }}% Ahorro</span>
+    <div class="w-full flex flex-col justify-between mt-3">
+      <div class="w-full ml-auto flex text-sm font-bold text-white">
+        <span class="flex items-center mr-2"><div class="w-4 h-4 my-1 bg-blue-500 mr-1"></div>{{ porcentajeFijos | number:'1.0-0' }}% Fijos</span>
+        <span class="flex items-center mr-2"><div class="w-4 h-4 my-1 bg-green-500 mr-1"></div>{{ porcentajeVariables | number:'1.0-0' }}% Variables</span>
+        <span class="flex items-center"><div class="w-4 h-4 my-1 bg-red-500 mr-1"></div>{{ porcentajeAhorro | number:'1.0-0' }}% Ahorro</span>
       </div>
-      <div class="w-full flex flex-col text-sm font-bold text-white">
-        <span>Ingresos: {{ ingresos.toFixed(2) }} €</span>
-        <span>Ahorro: {{ ahorro.toFixed(2) }} €</span>
-        <span>Dinero gastado: {{ totalGasto.toFixed(2) }} €</span>
-        <span>Dinero restante: {{ remainingMoney.toFixed(2) }} €</span>
+      <div class="w-full flex justify-between text-sm font-bold text-white mt-3">
+        <div class="p-[4px] rounded-lg">
+          <div class="bg-black rounded-lg p-2 flex flex-col items-center">
+            <span class="text-white mb-2">Ingresos</span>
+            <div class="xs:text-[14px] sm:text-[16px] text-[14px] font-bold text-white">
+              {{ ingresos.toFixed(2) }} €
+            </div>
+          </div>
+        </div>
+
+        <div class="p-[4px] rounded-lg">
+          <div class="bg-black rounded-lg p-2 flex flex-col items-center">
+            <span class="text-white mb-2">Ahorro</span>
+            <div class="xs:text-[14px] sm:text-[16px] text-[14px] font-bold text-white">
+              {{ ahorro.toFixed(2) }} €
+            </div>
+          </div>
+        </div>
+
+        <div class="p-[4px] rounded-lg">
+          <div class="bg-black rounded-lg p-2 flex flex-col items-center">
+            <span class="text-white mb-2">Gastado</span>
+            <div class="xs:text-[14px] sm:text-[16px] text-[14px] font-bold text-white">
+              {{ totalGasto.toFixed(2) }} €
+            </div>
+          </div>
+        </div>
+
+        <div class="p-[4px] rounded-lg">
+          <div class="bg-black rounded-lg p-2 flex flex-col items-center">
+            <span class="text-white mb-2">Restante</span>
+            <div class="xs:text-[14px] sm:text-[16px] text-[14px] font-bold text-white">
+              {{ remainingMoney.toFixed(2) }} €
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </article>
 
-  <article class="flex w-full my-4 gap-x-2">
-    <button (click)="changeView('table')" class="btn font-bold text-xs">Tabla</button>
-    <button (click)="changeView('grafico')" class="btn font-bold text-xs">Gráfico</button>
-    <button (click)="changeView('estadisticas')" class="btn font-bold text-xs">Estadísticas</button>
-    <button (click)="showModal()" class="btn font-bold text-xs">Añadir gasto</button>
+  <article class="flex w-full m-width-100 overflow-auto my-3 gap-x-2">
+    <button (click)="changeView('table')" class="btn whitespace-nowrap font-bold text-xs">Tabla</button>
+    <button (click)="changeView('grafico')" class="btn whitespace-nowrap font-bold text-xs">Gráfico</button>
+    <button (click)="changeView('estadisticas')" class="btn whitespace-nowrap font-bold text-xs">Estadísticas</button>
+    <button (click)="showModal()" class="btn whitespace-nowrap font-bold text-xs">Añadir gasto</button>
   </article>
 
   <app-modal-primary (gastoAñadido)="addGasto()" *ngIf="modalVisible" (closeModal)="closeModal()"></app-modal-primary>
